@@ -42,6 +42,11 @@ export abstract class ApiBase<R extends IApiResponse> implements IApi<R> {
     charset: string = 'utf-8';
 
     /**
+     * Default configures
+     */
+    config?: IApiConfig;
+
+    /**
      * Default response data type
      */
     defaultResponseType: ApiResponseType = ApiResponseType.Json;
@@ -60,11 +65,6 @@ export abstract class ApiBase<R extends IApiResponse> implements IApi<R> {
      * API response handler
      */
     onResponse?: IApiResponseHandler<R>;
-
-    /**
-     * Default configures
-     */
-    config?: IApiConfig;
 
     /**
      * Build API url

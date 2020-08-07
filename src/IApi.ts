@@ -229,6 +229,16 @@ export interface IApi<R extends IApiResponse> {
     charset: string;
 
     /**
+     * Default configures
+     */
+    config?: IApiConfig;
+
+    /**
+     * Default response data type
+     */
+    defaultResponseType: ApiResponseType;
+
+    /**
      * API error handler
      */
     onError?: IApiErrorHandler<R>;
@@ -244,15 +254,10 @@ export interface IApi<R extends IApiResponse> {
     onResponse?: IApiResponseHandler<R>;
 
     /**
-     * Default configures
-     */
-    config?: IApiConfig;
-
-    /**
      * Get content type and charset
      * @param headers Headers
      */
-    getContentTypeAndCharset(headers: HeadersInit): [string?, string?];
+    getContentTypeAndCharset(headers: HeadersInit): [string, string?];
 
     /**
      * Delete API
