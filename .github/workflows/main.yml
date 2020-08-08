@@ -44,7 +44,7 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
-      - run: npm config set @types:registry https://registry.npmjs.org/
+          scope: '@etsoo'
       - run: npm ci
       - run: npm publish --access public
         env:
