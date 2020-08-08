@@ -34,7 +34,7 @@ jobs:
       # run: npm test
 
       # Build the package
-      - run: npm build
+      - run: npm run build --if-present
 
       # Set scope
       - run: npm config set scope "@etsoo"
