@@ -32,7 +32,7 @@ jobs:
       - run: npm install
 
       # Make sure pass the test without any exception
-      # run: npm test
+      - run: npm test
 
       # Build the package
       - run: npm run build
