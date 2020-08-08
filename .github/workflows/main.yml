@@ -1,5 +1,6 @@
 # This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
 # For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+# https://docs.github.com/en/actions/language-and-framework-guides/publishing-nodejs-packages
 
 # Description
 name: Node.js Package
@@ -22,32 +23,23 @@ jobs:
       # Set up your GitHub Actions workflow with a specific version of node.js
       - uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: '12.x'
+          registry-url: 'https://registry.npmjs.org'
 
       # Named after Continuous Integration, installs dependencies directly from package-lock.json
-      - run: npm ci
+      # ci vs install
+      - run: npm install
 
       # Make sure pass the test without any exception
       # run: npm test
 
-  # Publish to NPM
-  publish-npm:
-    # Condition: previous build is successful
-    needs: build
-    
-    # Operation system
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm config set registry https://skimdb.npmjs.com/registry/:_authToken=$NODE_AUTH_TOKEN
-      - run: npm config set scope "@etsoo" --global
+      # Build the package
+      - run: npm build
+
+      # Set scope
+      - run: npm config set scope "@etsoo"
+      
+      # For scoped package, make it public for free service
       - run: npm publish --access public
         env:
-          # NPM Auth Token stored under the "Settings/Secrets"
-          NODE_AUTH_TOKEN: ${{secrets.ETSOONpmToken}}
+          NODE_AUTH_TOKEN: ${{ secrets.ETSOONpmToken }}
