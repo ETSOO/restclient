@@ -595,10 +595,15 @@ export abstract class ApiBase<R extends IApiResponse> implements IApi<R> {
                         return undefined;
                     }
 
-                    // Convert data type, error may occure
-                    result = parseResult as T;
+                    // Convert data type
+                    // null or undefined to a empty object
+                    if (parseResult) result = parseResult;
+                    else result = {} as T;
+                } else if (rawResult == null) {
+                    // null or undefined to a empty object
+                    result = {} as T;
                 } else {
-                    // Convert data type, error may occure
+                    // Convert data type
                     result = rawResult as T;
                 }
 
