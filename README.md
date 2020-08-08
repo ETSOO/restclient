@@ -35,6 +35,7 @@ const client = createClient();
 
 ```ts
 const client = new FetchApi();
+// Or
 const client = new AxiosApi();
 ```
 
@@ -58,6 +59,11 @@ client.get<Customer[]>('/api/customer').then(customers => {
 
 // Read one customer
 const customer = await client.get<Customer>('/api/customer/1');
+if(customer == null) {
+    // Error found
+    return;
+}
+console.log(customer.name);
 ```
 
 ### Error handling
@@ -94,7 +100,7 @@ const customer = await client.get<Customer>('/api/customer/1', undefined, {
 
 ## Methods
 
-Provides **delete, get, head, options, patch, post, put** syntactic sugar for **request** method. Return with **undefined** means error found. Define a **onError** callback function at **payload** only for the call or client's property **onError** for global error handling.
+Provides **delete, get, head, options, patch, post, put** syntactic sugar for **request** method. Return with **undefined** means error found. If the API return nothing with success, a **empty object {}** will be returned to distingush the error case. Define a **onError** callback function at **payload** only for the call or client's property **onError** for global error handling.
 
 ```ts
     /**
