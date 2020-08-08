@@ -44,11 +44,9 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
-      - run: npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-      - run: npm config set scope "@etsoo" --global
       - run: npm ci
+      - run: npm config set registry https://skimdb.npmjs.com/registry
       - run: npm publish --access public
         env:
-          CI: true
           # NPM Auth Token stored under the "Settings/Secrets"
           NODE_AUTH_TOKEN: ${{secrets.ETSOONpmToken}}
