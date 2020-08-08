@@ -45,6 +45,7 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       - run: npm ci
+      - run: npm config set registry https://skimdb.npmjs.com/registry
       - run: npm publish --access public
         env:
           # NPM Auth Token stored under the "Settings/Secrets"
