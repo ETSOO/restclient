@@ -21,6 +21,7 @@ jobs:
       - uses: actions/checkout@v2
         
       # Set up your GitHub Actions workflow with a specific version of node.js
+      # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
@@ -34,11 +35,9 @@ jobs:
       # run: npm test
 
       # Build the package
-      - run: npm run build --if-present
+      - run: npm run build
 
-      # Set scope
-      - run: npm config set scope "@etsoo"
-      
+      # Publish to npm
       # For scoped package, make it public for free service
       - run: npm publish --access public
         env:
