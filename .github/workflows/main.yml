@@ -29,7 +29,8 @@ jobs:
 
       # Auto version patch/minor
       # https://docs.npmjs.com/about-semantic-versioning
-      - run: git config --global
+      - run: git config --global user.email "info@etsoo.com"
+      - run: git config --global user.name "ETSOO"
       - run: npm version patch
 
       # Named after Continuous Integration, installs dependencies directly from package-lock.json
