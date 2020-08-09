@@ -1,7 +1,6 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.0.10",
-    "versionAutoUpdate": "patch",
+    "version": "1.0.11",
     "description": "TypeScript REST client supports Axios and Fetch",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -15,7 +14,7 @@
     "jest": {
         "automock": false,
         "testMatch": [
-            "<rootDir>/tests/**/*.ts"
+            "<rootDir>/__tests__/**/*.ts"
         ],
         "testEnvironment": "node",
         "transform": {
