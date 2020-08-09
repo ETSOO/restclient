@@ -3,6 +3,7 @@ import { FetchApi } from './FetchApi';
 import { IApi } from './IApi';
 
 export * from './ApiBase';
+export * from './ApiDataError';
 export * from './ApiError';
 export * from './AxiosApi';
 export * from './FetchApi';

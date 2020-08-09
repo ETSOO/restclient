@@ -101,7 +101,7 @@ export interface IApiData {
 /**
  * API error handler
  */
-export interface IApiErrorHandler<R> {
+export interface IApiErrorHandler<R extends IApiResponse> {
     (error: ApiDataError<R>): boolean | undefined | void;
 }
 
@@ -177,7 +177,7 @@ export interface IApiParser<T> {
 /**
  * API payload interface
  */
-export interface IApiPayload<T, R> {
+export interface IApiPayload<T, R extends IApiResponse> {
     /**
      * Content type
      */
@@ -217,7 +217,7 @@ export interface IApiPayload<T, R> {
 /**
  * API interface
  */
-export interface IApi<R extends IApiResponse> {
+export interface IApi<R extends IApiResponse = IApiResponse> {
     /**
      * API base url
      */
