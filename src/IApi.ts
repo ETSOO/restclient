@@ -133,6 +133,11 @@ export function isResponseErrorData(data: any): data is IResponseErrorData {
  */
 export interface IApiResponse {
     /**
+     * Response headers
+     */
+    headers: HeadersInit;
+
+    /**
      * Status code
      */
     status: number;

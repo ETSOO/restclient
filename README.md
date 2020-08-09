@@ -5,7 +5,7 @@
 - axios: https://github.com/axios/axios, based on XHR: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 - fetch: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
-ESLint + AirbnbBase + Prettier, Jest + ts-jest applied. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
+ESLint + AirbnbBase + Prettier, Jest(ts-jest) applied. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
 
 ## Installing
 
@@ -28,14 +28,17 @@ $ yarn add @etsoo/restclient
 - Depending on the envioronment, fetch first. If fetch is not supported, use axios.
 
 ```ts
-const client = createClient();
+import { createClient, IApi } from '@etsoo/restclient';
+const client: IApi = createClient();
 ```
 
 - Depending on your decision.
 
 ```ts
+import { FetchApi } from '@etsoo/restclient';
 const client = new FetchApi();
 // Or
+import { AxiosApi } from '@etsoo/restclient';
 const client = new AxiosApi();
 ```
 
@@ -92,7 +95,7 @@ const customer = await client.get<Customer>('/api/customer/1', undefined, {
 |---:|---|
 |baseUrl|API base URL, add to the API root of all calls|
 |charset|Charset for sending data, default is 'utf-8'|
-|config|See axios/Request Config or fetch/RequestInit or depending on your case|
+|config|See axios/Request Config or fetch/RequestInit|
 |defaultResponseType|Default type is JSON|
 |onError|Error occured callback|
 |onRequest|Before request callback|
