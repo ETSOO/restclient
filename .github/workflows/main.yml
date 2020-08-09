@@ -11,14 +11,18 @@ on: [push]
   #  types: [created]
 
 jobs:
-  # Build the project
-  build:
+  # Publish to Yarn
+  publish-yarn:
     # Operation system
     runs-on: ubuntu-latest
 
     steps:
+      # https://github.com/actions/checkout, This action checks-out your repository under $GITHUB_WORKSPACE
+      # so your workflow can access it.
       - uses: actions/checkout@v2
 
+      # Set up your GitHub Actions workflow with a specific version of node.js
+      # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
@@ -29,12 +33,22 @@ jobs:
       - run: yarn
 
       # Yarn publish
-      - run: yarn publish
+      # For scoped package, make it public for free service
+      - run: yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.ETSOONpmToken }}
-    
+  
+  # Publish to NPM
+  publish-npm:
+    # Condition: previous build is successful
+    needs: publish-yarn
+
+    # Operation system
+    runs-on: ubuntu-latest
+
     steps:
-      # https://github.com/actions/checkout, This action checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it.
+      # https://github.com/actions/checkout, This action checks-out your repository under $GITHUB_WORKSPACE
+      # so your workflow can access it.
       - uses: actions/checkout@v2
         
       # Set up your GitHub Actions workflow with a specific version of node.js
