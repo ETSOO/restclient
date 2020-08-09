@@ -101,7 +101,7 @@ export interface IApiData {
 /**
  * API error handler
  */
-export interface IApiErrorHandler<R> {
+export interface IApiErrorHandler<R = any> {
     (error: ApiDataError<R>): boolean | undefined | void;
 }
 

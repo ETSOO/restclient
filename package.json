@@ -1,12 +1,12 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.0.14",
+    "version": "1.0.15",
     "description": "TypeScript REST client supports Axios and Fetch",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
     "scripts": {
         "build": "tsc",
-        "format": "prettier --write **/*.ts",
+        "format": "prettier --write src/**/*.ts",
         "lint": "eslint --ext .ts,.tsx src/",
         "test": "jest",
         "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand"

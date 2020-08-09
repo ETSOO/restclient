@@ -85,8 +85,14 @@ const customer = await client.get<Customer>('/api/customer/1', undefined, {
     // Current call's error handling
     onError = (error) => {
         console.log(error);
+        // return false to prevent further error handling
+        return false;
     }
 });
+if(customer == null) {
+    // Error found
+    return;
+}
 ```
 
 ## Properties
