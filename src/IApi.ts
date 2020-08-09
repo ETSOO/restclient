@@ -101,7 +101,7 @@ export interface IApiData {
 /**
  * API error handler
  */
-export interface IApiErrorHandler<R extends IApiResponse> {
+export interface IApiErrorHandler<R> {
     (error: ApiDataError<R>): boolean | undefined | void;
 }
 
@@ -138,6 +138,11 @@ export interface IApiResponse {
     headers: HeadersInit;
 
     /**
+     * OK status
+     */
+    ok: boolean;
+
+    /**
      * Status code
      */
     status: number;
@@ -158,7 +163,7 @@ export interface IApiRequestHandler {
 /**
  * API Response handler
  */
-export interface IApiResponseHandler<R extends IApiResponse> {
+export interface IApiResponseHandler<R> {
     (data: IApiData, response: R): void;
 }
 
@@ -182,7 +187,7 @@ export interface IApiParser<T> {
 /**
  * API payload interface
  */
-export interface IApiPayload<T, R extends IApiResponse> {
+export interface IApiPayload<T, R> {
     /**
      * Content type
      */
@@ -222,7 +227,7 @@ export interface IApiPayload<T, R extends IApiResponse> {
 /**
  * API interface
  */
-export interface IApi<R extends IApiResponse = IApiResponse> {
+export interface IApi<R = any> {
     /**
      * API base url
      */
@@ -361,4 +366,10 @@ export interface IApi<R extends IApiResponse = IApiResponse> {
         data?: ApiRequestData,
         payload?: IApiPayload<T, R>
     ): Promise<T | undefined>;
+
+    /**
+     * Transform the original response to unified object
+     * @param response Original response
+     */
+    transformResponse(response: R): IApiResponse;
 }

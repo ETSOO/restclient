@@ -1,6 +1,6 @@
 import axios, { Method, AxiosResponse, ResponseType } from 'axios';
 import { ApiBase } from './ApiBase';
-import { ApiMethod, ApiResponseType } from './IApi';
+import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
 import { headersToObject, isJSONContentType } from './Utils';
 
 /**
@@ -90,10 +90,19 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
     }
 
     /**
-     * Is the response in Ok status
+     * Transform original response to unified object
+     * @param response Original response
      */
-    protected responseOk(response: AxiosResponse): boolean {
-        const { status } = response;
-        return status >= 200 && status < 299;
+    public transformResponse(response: AxiosResponse): IApiResponse {
+        const { headers, status, statusText } = response;
+
+        // HTTP status codes range from 200-299
+        const ok = status >= 200 && status <= 299;
+        return {
+            headers,
+            ok,
+            status,
+            statusText
+        };
     }
 }

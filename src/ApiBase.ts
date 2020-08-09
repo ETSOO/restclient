@@ -9,10 +9,10 @@ import {
     IApiResponseHandler,
     IApiConfig,
     IApiData,
-    IApiResponse,
     isResponseErrorData,
     ApiParams,
-    ApiResponseType
+    ApiResponseType,
+    IApiResponse
 } from './IApi';
 import { ApiError } from './ApiError';
 import {
@@ -25,7 +25,7 @@ import { ApiDataError } from './ApiDataError';
 /**
  * Api abstract class
  */
-export abstract class ApiBase<R extends IApiResponse> implements IApi<R> {
+export abstract class ApiBase<R> implements IApi<R> {
     /**
      * Headers content type key
      */
@@ -365,11 +365,6 @@ export abstract class ApiBase<R extends IApiResponse> implements IApi<R> {
     ): Promise<any>;
 
     /**
-     * Is the response in Ok status
-     */
-    protected abstract responseOk(response: R): boolean;
-
-    /**
      * Get response error message
      * @param data Response data
      */
@@ -395,10 +390,11 @@ export abstract class ApiBase<R extends IApiResponse> implements IApi<R> {
         return promise
             .then(async (response) => {
                 // Destruct
-                const { status, statusText } = response;
+                const { ok, status, statusText } = this.transformResponse(
+                    response
+                );
 
-                if (this.responseOk(response)) {
-                    // HTTP status codes range from 200-299
+                if (ok) {
                     return { response };
                 }
 
@@ -617,6 +613,12 @@ export abstract class ApiBase<R extends IApiResponse> implements IApi<R> {
 
         return undefined;
     }
+
+    /**
+     * Transform original response to unified object
+     * @param response Original response
+     */
+    public abstract transformResponse(response: R): IApiResponse;
 
     /**
      * Delete API

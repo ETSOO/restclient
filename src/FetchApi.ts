@@ -1,5 +1,5 @@
 import { ApiBase } from './ApiBase';
-import { ApiMethod, ApiResponseType } from './IApi';
+import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
 import { isJSONContentType } from './Utils';
 
 /**
@@ -86,10 +86,17 @@ export class FetchApi extends ApiBase<Response> {
     }
 
     /**
-     * Is the response in Ok status
+     * Transform original response to unified object
+     * @param response Original response
      */
-    protected responseOk(response: Response): boolean {
+    public transformResponse(response: Response): IApiResponse {
         // https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
-        return response.ok;
+        const { headers, ok, status, statusText } = response;
+        return {
+            headers,
+            ok,
+            status,
+            statusText
+        };
     }
 }

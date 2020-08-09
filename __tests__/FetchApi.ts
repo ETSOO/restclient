@@ -85,13 +85,6 @@ class FetchApiHelper extends FetchApi {
     ): Promise<any> {
         return super.responseData(response, responseType);
     }
-
-    /**
-     * Is the response in Ok status
-     */
-    responseOk(response: Response): boolean {
-        return super.responseOk(response);
-    }
 }
 
 /**
@@ -145,7 +138,7 @@ describe('Protected methods tests', () => {
         expect(response).toBeDefined();
 
         // Response status is OK
-        expect(api.responseOk(response)).toBeTruthy();
+        expect(api.transformResponse(response).ok).toBeTruthy();
 
         // Response data should be defined
         const result = await api.responseData(response, ApiResponseType.Json);

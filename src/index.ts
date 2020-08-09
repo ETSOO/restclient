@@ -14,7 +14,7 @@ export * from './Utils';
 /**
  * Create REST API client
  */
-export function createClient(): IApi<any> {
+export function createClient(): IApi {
     if (typeof fetch === 'undefined') return new AxiosApi();
     return new FetchApi();
 }

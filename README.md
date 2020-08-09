@@ -125,6 +125,12 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
         data?: ApiRequestData,
         payload?: IApiPayload<T, R>
     ): Promise<T | undefined>;
+
+    /**
+     * Transform the original response to a unified object
+     * @param response Original response
+     */
+    transformResponse(response: R): IApiResponse;
 ```
 
 ## License
