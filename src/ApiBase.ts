@@ -116,11 +116,11 @@ export abstract class ApiBase<R> implements IApi<R> {
                     if (data instanceof String) {
                         if (data.startsWith('{') && data.endsWith('}')) {
                             // Guess as JSON
-                            if (localContentType)
+                            if (!localContentType)
                                 localContentType = 'application/json';
                         } else if (data.startsWith('<') && data.endsWith('>')) {
                             // Guess as XML
-                            if (localContentType)
+                            if (!localContentType)
                                 localContentType = 'application/xml';
                         }
                         this.setContentType(headers, localContentType);
@@ -134,7 +134,7 @@ export abstract class ApiBase<R> implements IApi<R> {
                             isJSONContentType(localContentType))
                     ) {
                         // Object type, default to JSON
-                        if (localContentType)
+                        if (!localContentType)
                             localContentType = 'application/json';
                         this.setContentType(headers, localContentType);
 
@@ -142,7 +142,7 @@ export abstract class ApiBase<R> implements IApi<R> {
                     }
 
                     // Default form data
-                    if (localContentType == null)
+                    if (!localContentType)
                         localContentType = 'application/x-www-form-urlencoded';
                     this.setContentType(headers, localContentType);
 
