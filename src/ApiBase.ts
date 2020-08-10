@@ -94,7 +94,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      * @param data Raw data
      * @param contentType Content type
      */
-    private formatData(
+    protected formatData(
         method: ApiMethod,
         headers: HeadersInit,
         params: URLSearchParams,
@@ -526,6 +526,7 @@ export abstract class ApiBase<R> implements IApi<R> {
         // API data
         const apiData: IApiData = {
             data: formattedData,
+            headers,
             method,
             params: localParams,
             responseType,

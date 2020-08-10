@@ -4,7 +4,7 @@ import { enableFetchMocks } from 'jest-fetch-mock';
 import axios, { AxiosResponse, AxiosRequestConfig, AxiosPromise } from 'axios';
 import { mocked } from 'ts-jest/dist/util/testing';
 import { AxiosApi } from '../src/AxiosApi';
-import { ApiMethod, ApiResponseType } from '../src/IApi';
+import { ApiMethod, ApiResponseType, ApiRequestData } from '../src/IApi';
 import { ApiError } from '../src/ApiError';
 
 /**
@@ -46,6 +46,24 @@ class AxiosApiHelper extends AxiosApi {
             responseType,
             rest
         );
+    }
+
+    /**
+     * Format posted data
+     * @param method Verb
+     * @param headers Headers
+     * @param params URL parameters
+     * @param data Raw data
+     * @param contentType Content type
+     */
+    formatData(
+        method: ApiMethod,
+        headers: HeadersInit,
+        params: URLSearchParams,
+        data?: ApiRequestData,
+        contentType?: string
+    ): [any, Error?] {
+        return super.formatData(method, headers, params, data, contentType);
     }
 
     /**
@@ -158,6 +176,20 @@ describe('Protected methods tests', () => {
 
         // Response data matches
         expect(response.data).toContainEqual({ id: 'CN', name: 'China' });
+    });
+
+    test('Tests for formatData', () => {
+        const headers = {};
+        const [data] = api.formatData(
+            ApiMethod.PUT,
+            headers,
+            new URLSearchParams(),
+            { id: 1, name: 'test' }
+        );
+        expect(typeof data).toBe('string');
+        expect(api.getContentTypeAndCharset(headers)[0]).toBe(
+            'application/json'
+        );
     });
 });
 

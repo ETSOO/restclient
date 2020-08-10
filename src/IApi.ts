@@ -73,6 +73,11 @@ export interface IApiData {
     depth?: number;
 
     /**
+     * Request headers
+     */
+    headers: HeadersInit;
+
+    /**
      * API verb
      */
     method: ApiMethod;
