@@ -3,7 +3,7 @@ import { IApiData } from './IApi';
 /**
  * Api Data Error
  */
-export class ApiDataError<R> extends Error {
+export class ApiDataError<R = any> extends Error {
     /**
      * Api data
      */

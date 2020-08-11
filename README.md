@@ -119,6 +119,12 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
     getContentTypeAndCharset(headers: HeadersInit): [string, string?];
 
     /**
+     * Get content type
+     * @param headers Headers
+     */
+    getHeaderValue(headers: HeadersInit, key: string): string | null;
+
+    /**
      * Request to API
      * @param method Method
      * @param url API URL

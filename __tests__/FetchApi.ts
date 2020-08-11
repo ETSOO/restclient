@@ -2,7 +2,12 @@
 
 import { enableFetchMocks } from 'jest-fetch-mock';
 import { FetchApi } from '../src/FetchApi';
-import { ApiMethod, IApiConfig, ApiResponseType } from '../src/IApi';
+import {
+    ApiMethod,
+    IApiConfig,
+    ApiResponseType,
+    ApiRequestData
+} from '../src/IApi';
 
 /**
  * Fetch Api helper class for testing
@@ -72,6 +77,24 @@ class FetchApiHelper extends FetchApi {
             responseType,
             rest
         );
+    }
+
+    /**
+     * Format posted data
+     * @param method Verb
+     * @param headers Headers
+     * @param params URL parameters
+     * @param data Raw data
+     * @param contentType Content type
+     */
+    formatData(
+        method: ApiMethod,
+        headers: HeadersInit,
+        params: URLSearchParams,
+        data?: ApiRequestData,
+        contentType?: string
+    ): [any, Error?] {
+        return super.formatData(method, headers, params, data, contentType);
     }
 
     /**
@@ -146,6 +169,21 @@ describe('Protected methods tests', () => {
 
         // Response data matches
         expect(result).toContainEqual({ id: 'CN', name: 'China' });
+    });
+
+    test('Tests for formatData', () => {
+        const headers = {};
+        const [data] = api.formatData(
+            ApiMethod.PUT,
+            headers,
+            new URLSearchParams(),
+            { id: 1, name: 'test' }
+        );
+        expect(api.getContentTypeAndCharset(headers)[0]).toBe(
+            'application/json'
+        );
+        expect(typeof data).toBe('string');
+        expect(data).toMatch('"id":');
     });
 });
 
@@ -248,6 +286,9 @@ describe('POST tests', () => {
         // Api client
         const localApi = new FetchApi();
         localApi.onRequest = (apiData) => {
+            expect(api.getContentTypeAndCharset(apiData.headers)[0]).toBe(
+                'application/json'
+            );
             expect(apiData.method).toBe(ApiMethod.POST);
         };
         localApi.onResponse = (apiData) => {
@@ -266,7 +307,7 @@ describe('POST tests', () => {
         // Act
         const okResult = await localApi.post<CountryItem[]>(
             '/Customer/CountryList',
-            undefined,
+            { id: 1 },
             { params: { id: 2, name: 'test' } }
         );
 

@@ -275,6 +275,12 @@ export interface IApi<R = any> {
     getContentTypeAndCharset(headers: HeadersInit): [string, string?];
 
     /**
+     * Get content type
+     * @param headers Headers
+     */
+    getHeaderValue(headers: HeadersInit, key: string): string | null;
+
+    /**
      * Delete API
      * @param url API URL
      * @param data Passed data

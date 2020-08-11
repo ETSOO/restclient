@@ -247,7 +247,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      * Get content type
      * @param headers Headers
      */
-    protected getHeaderValue(headers: HeadersInit, key: string): string | null {
+    public getHeaderValue(headers: HeadersInit, key: string): string | null {
         // String array
         if (Array.isArray(headers)) {
             const index = headers.findIndex((item) => {
