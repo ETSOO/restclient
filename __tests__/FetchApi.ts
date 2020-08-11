@@ -6,7 +6,8 @@ import {
     ApiMethod,
     IApiConfig,
     ApiResponseType,
-    ApiRequestData
+    ApiRequestData,
+    ApiAuthorizationScheme
 } from '../src/IApi';
 
 /**
@@ -187,6 +188,21 @@ describe('Protected methods tests', () => {
     });
 });
 
+describe('authorize tests', () => {
+    test('Global level', () => {
+        // Act
+        api.authorize(ApiAuthorizationScheme.Bearer, 'abc');
+
+        // Assert
+        expect(api.config?.headers).toBeDefined();
+        if (api.config?.headers) {
+            expect(
+                api.getHeaderValue(api.config.headers, 'Authorization')
+            ).toBe('Bearer abc');
+        }
+    });
+});
+
 describe('buildUrl tests', () => {
     test('buildUrl concatenation ', () => {
         const url = '/Customer/CountryList/11';
@@ -285,12 +301,24 @@ describe('POST tests', () => {
 
         // Api client
         const localApi = new FetchApi();
+
+        // Global authorization
+        localApi.authorize('etsoo', 'abc');
+
+        // On request
         localApi.onRequest = (apiData) => {
+            // Local authorization test
+            expect(api.getHeaderValue(apiData.headers, 'Authorization')).toBe(
+                'Basic basic'
+            );
+
             expect(api.getContentTypeAndCharset(apiData.headers)[0]).toBe(
                 'application/json'
             );
             expect(apiData.method).toBe(ApiMethod.POST);
         };
+
+        // On response
         localApi.onResponse = (apiData) => {
             // part with string
             expect(apiData.url).toMatch('id=2');
@@ -305,10 +333,15 @@ describe('POST tests', () => {
         });
 
         // Act
+        const config = { headers: {} };
+
+        // Local authorization
+        api.authorize(ApiAuthorizationScheme.Basic, 'basic', config.headers);
+
         const okResult = await localApi.post<CountryItem[]>(
             '/Customer/CountryList',
             { id: 1 },
-            { params: { id: 2, name: 'test' } }
+            { params: { id: 2, name: 'test' }, config }
         );
 
         // Assert

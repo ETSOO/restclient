@@ -113,6 +113,19 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
 
 ```ts
     /**
+     * Authorize the call
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
+     * @param scheme Scheme
+     * @param token Token, empty/null/undefined to remove it
+     * @param writeHeaders Headers to write authtication, default to all calls
+     */
+    authorize(
+        scheme: ApiAuthorizationScheme | string,
+        token: string | undefined,
+        writeHeaders?: HeadersInit
+    ): void;
+
+    /**
      * Get content type and charset
      * @param headers Headers
      */

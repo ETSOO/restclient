@@ -12,7 +12,8 @@ import {
     isResponseErrorData,
     ApiParams,
     ApiResponseType,
-    IApiResponse
+    IApiResponse,
+    ApiAuthorizationScheme
 } from './IApi';
 import { ApiError } from './ApiError';
 import {
@@ -65,6 +66,47 @@ export abstract class ApiBase<R> implements IApi<R> {
      * API response handler
      */
     onResponse?: IApiResponseHandler<R>;
+
+    /**
+     * Authorize the call
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
+     * @param scheme Scheme
+     * @param token Token, empty/null/undefined to remove it
+     * @param writeHeaders Headers to write authtication, default to all calls
+     */
+    authorize(
+        scheme: ApiAuthorizationScheme | string,
+        token: string | undefined,
+        writeHeaders?: HeadersInit
+    ): void {
+        // Scheme name
+        const schemeName =
+            typeof scheme === 'number'
+                ? ApiAuthorizationScheme[scheme]
+                : scheme;
+
+        // Headers
+        let headers: HeadersInit;
+        if (writeHeaders == null) {
+            if (this.config == null) {
+                headers = {};
+                this.config = { headers };
+            } else if (this.config.headers) {
+                headers = this.config.headers;
+            } else {
+                headers = {};
+                this.config.headers = headers;
+            }
+        } else {
+            headers = writeHeaders;
+        }
+
+        // Authentication header value
+        const value = token ? `${schemeName} ${token}` : token;
+
+        // Set
+        this.setHeaderValue(headers, 'Authorization', value);
+    }
 
     /**
      * Build API url
