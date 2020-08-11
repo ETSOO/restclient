@@ -441,11 +441,20 @@ export abstract class ApiBase<R> implements IApi<R> {
                 }
 
                 // Other status codes are considered as error
-                const message =
-                    statusText ||
-                    this.responseErrorMessage(
-                        await this.responseData(response, ApiResponseType.Json)
+                // Try to read response JSON data
+                let errorMessage: string | null;
+                try {
+                    // When parse, may have unexpected end of JSON input
+                    const responseData = await this.responseData(
+                        response,
+                        ApiResponseType.Json
                     );
+                    errorMessage = this.responseErrorMessage(responseData);
+                } catch {
+                    errorMessage = null;
+                }
+
+                const message = statusText || errorMessage || 'Unkown';
                 const error = new ApiError(message, status);
                 return { error, response };
             })

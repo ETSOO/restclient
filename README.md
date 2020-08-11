@@ -54,6 +54,9 @@ interface Customer {
 // API client
 const client = createClient();
 
+// Authorization, JWT
+client.authorize(ApiAuthorizationScheme.Bearer, '*** JWT token ***');
+
 // Read customer list with asyc/await ES6+ style
 const customers = await client.get<Customer[]>('/api/customer');
 // or with traditional callback way
