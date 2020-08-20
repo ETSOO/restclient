@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+import { DomUtils, DataTypes } from '@etsoo/shared';
 import {
     IApi,
     ApiMethod,
@@ -16,11 +17,6 @@ import {
     ApiAuthorizationScheme
 } from './IApi';
 import { ApiError } from './ApiError';
-import {
-    isSimpleObject,
-    mergeURLSearchParams,
-    isJSONContentType
-} from './Utils';
 import { ApiDataError } from './ApiDataError';
 
 /**
@@ -173,7 +169,7 @@ export abstract class ApiBase<R> implements IApi<R> {
                     if (
                         data.constructor === Object ||
                         (localContentType &&
-                            isJSONContentType(localContentType))
+                            DomUtils.isJSONContentType(localContentType))
                     ) {
                         // Object type, default to JSON
                         if (!localContentType)
@@ -217,8 +213,8 @@ export abstract class ApiBase<R> implements IApi<R> {
                 data.forEach((value, key) => {
                     params.set(key, value);
                 });
-            } else if (isSimpleObject(data)) {
-                mergeURLSearchParams(params, data);
+            } else if (DataTypes.isSimpleObject(data)) {
+                DomUtils.mergeURLSearchParams(params, data);
             } else {
                 return [
                     undefined,
@@ -520,7 +516,7 @@ export abstract class ApiBase<R> implements IApi<R> {
         if (params instanceof URLSearchParams) return params;
 
         // SimpleObject
-        return mergeURLSearchParams(new URLSearchParams(), params);
+        return DomUtils.mergeURLSearchParams(new URLSearchParams(), params);
     }
 
     /**

@@ -1,7 +1,7 @@
 import axios, { Method, AxiosResponse, ResponseType } from 'axios';
+import { DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
-import { headersToObject, isJSONContentType } from './Utils';
 
 /**
  * Axios API
@@ -53,7 +53,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
         const requestBody = {
             ...rest,
             data,
-            headers: headersToObject(headers),
+            headers: DomUtils.headersToObject(headers),
             method: ApiMethod[method] as Method,
             responseType: localResponseType,
             url
@@ -79,7 +79,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
 
             if (
                 (responseType === ApiResponseType.Json ||
-                    isJSONContentType(contentType)) &&
+                    DomUtils.isJSONContentType(contentType)) &&
                 typeof data === 'string'
             ) {
                 // Convert string to JSON object, rare

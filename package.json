@@ -1,6 +1,6 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.0.21",
+    "version": "1.0.22",
     "description": "TypeScript REST client supports Axios and Fetch",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -16,16 +16,26 @@
         "testMatch": [
             "<rootDir>/__tests__/**/*.ts"
         ],
-        "testEnvironment": "node",
+        "testEnvironment": "jsdom",
         "transform": {
-            ".+\\.ts$": "ts-jest"
-        }
+            ".+\\.jsx?$": "babel-jest",
+            ".+\\.tsx?$": "ts-jest"
+        },
+        "transformIgnorePatterns": [
+            "/node_modules/(?!@etsoo/).+\\.js$"
+        ]
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/ETSOO/restclient.git"
     },
-    "keywords": [],
+    "keywords": [
+        "REST",
+        "API",
+        "axios",
+        "fetch",
+        "TypeScript"
+    ],
     "author": "Garry Xiao",
     "license": "MIT",
     "bugs": {
@@ -33,20 +43,26 @@
     },
     "homepage": "https://github.com/ETSOO/restclient#readme",
     "dependencies": {
+        "@etsoo/shared": "^1.0.1",
         "axios": "^0.19.2",
-        "typescript": "^3.9.7",
-        "ts-jest": "^26.1.4"
+        "typescript": "^3.9.7"
     },
     "devDependencies": {
+        "@babel/core": "^7.11.4",
+        "@babel/preset-env": "^7.11.0",
         "@types/jest": "^26.0.8",
         "@typescript-eslint/eslint-plugin": "^3.7.1",
         "@typescript-eslint/parser": "^3.7.1",
+        "babel-core": "^7.0.0-bridge.0",
+        "babel-jest": "^26.3.0",
         "eslint": "^7.6.0",
         "eslint-config-airbnb-base": "^14.2.0",
         "eslint-config-prettier": "^6.11.0",
         "eslint-plugin-import": "^2.22.0",
         "jest": "^26.2.2",
         "jest-fetch-mock": "^3.0.3",
-        "prettier": "^2.0.5"
+        "prettier": "^2.0.5",
+        "regenerator-runtime": "^0.13.7",
+        "ts-jest": "^26.1.4"
     }
 }

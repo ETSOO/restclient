@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-
 import { enableFetchMocks } from 'jest-fetch-mock';
 import { FetchApi } from '../src/FetchApi';
 import {

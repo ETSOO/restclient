@@ -1,6 +1,6 @@
+import { DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
-import { isJSONContentType } from './Utils';
 
 /**
  * Fetch API
@@ -47,7 +47,7 @@ export class FetchApi extends ApiBase<Response> {
 
         if (
             responseType === ApiResponseType.Json ||
-            isJSONContentType(contentType)
+            DomUtils.isJSONContentType(contentType)
         )
             return response.json();
 

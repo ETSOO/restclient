@@ -1,4 +1,4 @@
-import { SimpleObject } from './Utils';
+import { DataTypes } from '@etsoo/shared';
 import { ApiDataError } from './ApiDataError';
 
 /**
@@ -50,7 +50,7 @@ export type ApiRequestData =
     | FormData
     | Object
     | ReadableStream
-    | SimpleObject
+    | DataTypes.SimpleObject
     | String
     | URLSearchParams;
 
@@ -189,7 +189,7 @@ export type ApiResult<T> = [Error?, T?];
 /**
  * API params type
  */
-export type ApiParams = SimpleObject | URLSearchParams;
+export type ApiParams = DataTypes.SimpleObject | URLSearchParams;
 
 /**
  * API data parser

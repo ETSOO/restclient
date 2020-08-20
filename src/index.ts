@@ -9,7 +9,6 @@ export * from './AxiosApi';
 export * from './FetchApi';
 export * from './IApi';
 export * from './JestTester';
-export * from './Utils';
 
 /**
  * Create REST API client

@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 import { enableFetchMocks } from 'jest-fetch-mock';
 import axios, { AxiosResponse, AxiosRequestConfig, AxiosPromise } from 'axios';
 import { mocked } from 'ts-jest/dist/util/testing';
