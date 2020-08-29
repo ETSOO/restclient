@@ -94,6 +94,8 @@ const customer = await client.get<Customer>('/api/customer/1', undefined, {
 });
 if(customer == null) {
     // Error found
+    // client.lastError cache the last error
+    // For accurate check, validate client.lastError.data.url
     return;
 }
 ```
@@ -106,6 +108,7 @@ if(customer == null) {
 |charset|Charset for sending data, default is 'utf-8'|
 |config|See axios/Request Config or fetch/RequestInit|
 |defaultResponseType|Default type is JSON|
+|lastError|Last error for track|
 |onError|Error occured callback|
 |onRequest|Before request callback|
 |onResponse|After response callback|

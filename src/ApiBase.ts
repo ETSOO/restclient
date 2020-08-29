@@ -48,6 +48,15 @@ export abstract class ApiBase<R> implements IApi<R> {
      */
     defaultResponseType: ApiResponseType = ApiResponseType.Json;
 
+    private lastErrorPrivate?: ApiDataError<R>;
+
+    /**
+     * Last error
+     */
+    get lastError() {
+        return this.lastErrorPrivate;
+    }
+
     /**
      * API error handler
      */
@@ -487,6 +496,9 @@ export abstract class ApiBase<R> implements IApi<R> {
         // Data error
         const dataError = new ApiDataError<R>(error, data, response);
 
+        // Cache the error
+        this.lastErrorPrivate = dataError;
+
         if (localDoError == null && this.onError == null) {
             // No error handler, throw the error
             throw dataError;
@@ -542,6 +554,9 @@ export abstract class ApiBase<R> implements IApi<R> {
             responseType = this.defaultResponseType,
             showLoading
         } = payload || {};
+
+        // Reset last error
+        this.lastErrorPrivate = undefined;
 
         // Merge configure
         this.mergeConfig(config);

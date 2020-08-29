@@ -263,6 +263,11 @@ export interface IApi<R = any> {
     defaultResponseType: ApiResponseType;
 
     /**
+     * Last error
+     */
+    lastError?: ApiDataError<R>;
+
+    /**
      * API error handler
      */
     onError?: IApiErrorHandler<R>;

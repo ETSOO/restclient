@@ -285,6 +285,7 @@ describe('GET tests', () => {
 
         // Assert
         expect(failResult).toBeUndefined();
+        expect(api.lastError?.data.url).toBe('/Customer/CountryList');
     });
 });
 
