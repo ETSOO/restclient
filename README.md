@@ -164,6 +164,21 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
     transformResponse(response: R): IApiResponse;
 ```
 
+## Call Payload
+
+When you call any API, pass additional properties with the payload parameter.
+
+|Name|Description|
+|---:|---|
+|contentType|Specify data type to send, like 'application/json'|
+|onError|Current API call error callback|
+|config|Current API config. See axios/Request Config or fetch/RequestInit|
+|defaultValue|Default value, like [] for array return|
+|params|URL parameters|
+|parser|Current API response data parser|
+|responseType|Specify response data type|
+|showLoading|Whether to show loading bar|
+
 ## License
 
 [MIT](LICENSE)

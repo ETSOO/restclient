@@ -548,6 +548,7 @@ export abstract class ApiBase<R> implements IApi<R> {
         const {
             contentType,
             config = {},
+            defaultValue,
             onError,
             params,
             parser,
@@ -637,8 +638,10 @@ export abstract class ApiBase<R> implements IApi<R> {
                     responseType
                 );
 
-                // Transform data type
-                let result: T;
+                // May return null or ''
+                if (rawResult == null || rawResult === '') {
+                    return defaultValue;
+                }
 
                 if (parser) {
                     // Parser case
@@ -654,20 +657,12 @@ export abstract class ApiBase<R> implements IApi<R> {
                         return undefined;
                     }
 
-                    // Convert data type
-                    // null or undefined to a empty object
-                    if (parseResult) result = parseResult;
-                    else result = {} as T;
-                } else if (rawResult == null) {
-                    // null or undefined to a empty object
-                    result = {} as T;
-                } else {
-                    // Convert data type
-                    result = rawResult as T;
+                    if (parseResult) return parseResult;
+                    return defaultValue;
                 }
 
-                // Return result
-                return result;
+                // Transform data type
+                return rawResult as T;
             } catch (exception) {
                 apiData.depth = 3;
                 this.handleError(exception, apiData, response, onError);

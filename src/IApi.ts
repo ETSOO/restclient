@@ -218,6 +218,11 @@ export interface IApiPayload<T, R> {
     config?: IApiConfig;
 
     /**
+     * Default value
+     */
+    defaultValue?: T;
+
+    /**
      * URL parameters
      */
     params?: ApiParams;
