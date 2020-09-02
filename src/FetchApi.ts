@@ -48,8 +48,11 @@ export class FetchApi extends ApiBase<Response> {
         if (
             responseType === ApiResponseType.Json ||
             DomUtils.isJSONContentType(contentType)
-        )
+        ) {
+            // 204 = No content
+            if (response.status === 204) return Promise.resolve({});
             return response.json();
+        }
 
         if (
             responseType === ApiResponseType.Blob ||
