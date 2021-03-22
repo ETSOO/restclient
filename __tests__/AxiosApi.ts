@@ -1,6 +1,6 @@
 import { enableFetchMocks } from 'jest-fetch-mock';
+import { mocked } from 'ts-jest/utils';
 import axios, { AxiosResponse, AxiosRequestConfig, AxiosPromise } from 'axios';
-import { mocked } from 'ts-jest/dist/util/testing';
 import { AxiosApi } from '../src/AxiosApi';
 import { ApiMethod, ApiResponseType, ApiRequestData } from '../src/IApi';
 import { ApiError } from '../src/ApiError';

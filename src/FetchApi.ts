@@ -68,7 +68,7 @@ export class FetchApi extends ApiBase<Response> {
                 response.text().then((value) => {
                     // Document type
                     const type = contentType
-                        ? (contentType as SupportedType)
+                        ? (contentType as DOMParserSupportedType)
                         : 'application/xml';
 
                     // Transform text to document object (DOM)
