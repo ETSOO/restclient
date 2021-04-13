@@ -96,7 +96,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
      * Transform original response to unified object
      * @param response Original response
      */
-    public transformResponse(response: AxiosResponse): IApiResponse {
+    transformResponse(response: AxiosResponse): IApiResponse {
         const { headers, status, statusText } = response;
 
         // HTTP status codes range from 200-299

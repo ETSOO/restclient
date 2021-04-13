@@ -92,7 +92,7 @@ export class FetchApi extends ApiBase<Response> {
      * Transform original response to unified object
      * @param response Original response
      */
-    public transformResponse(response: Response): IApiResponse {
+    transformResponse(response: Response): IApiResponse {
         // https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
         const { headers, ok, status, statusText } = response;
         return {

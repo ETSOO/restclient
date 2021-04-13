@@ -182,6 +182,13 @@ export interface IApiResponseHandler<R> {
 }
 
 /**
+ * API complete handler
+ */
+ export interface IApiCompleteHandler<R> {
+    (data: IApiData, response?: R): void;
+}
+
+/**
  * API result type
  */
 export type ApiResult<T> = [Error?, T?];
@@ -281,6 +288,11 @@ export interface IApi<R = any> {
      * API request handler
      */
     onRequest?: IApiRequestHandler;
+
+    /**
+     * API complete handler
+     */
+    onComplete?: IApiCompleteHandler<R>;
 
     /**
      * API response handler
@@ -409,6 +421,28 @@ export interface IApi<R = any> {
         data?: ApiRequestData,
         payload?: IApiPayload<T, R>
     ): Promise<T | undefined>;
+
+    /**
+     * Set content language
+     * @param language Content language
+     * @param headers Headers
+     */
+    setContentLanguage(
+        language: string | null | undefined,
+        headers?: HeadersInit
+    ): void;
+
+    /**
+     * Set header value
+     * @param key Header name
+     * @param value Header value
+     * @param headers Optional headers to lookup
+     */
+    setHeaderValue(
+        key: string,
+        value: string | null | undefined,
+        headers?: HeadersInit
+    ): void;
 
     /**
      * Transform the original response to unified object

@@ -14,7 +14,8 @@ import {
     ApiParams,
     ApiResponseType,
     IApiResponse,
-    ApiAuthorizationScheme
+    ApiAuthorizationScheme,
+    IApiCompleteHandler
 } from './IApi';
 import { ApiError } from './ApiError';
 import { ApiDataError } from './ApiDataError';
@@ -68,6 +69,11 @@ export abstract class ApiBase<R> implements IApi<R> {
     onRequest?: IApiRequestHandler;
 
     /**
+     * API complete handler
+     */
+    onComplete?: IApiCompleteHandler<R>;
+
+    /**
      * API response handler
      */
     onResponse?: IApiResponseHandler<R>;
@@ -91,26 +97,13 @@ export abstract class ApiBase<R> implements IApi<R> {
                 : scheme;
 
         // Headers
-        let headers: HeadersInit;
-        if (writeHeaders == null) {
-            if (this.config == null) {
-                headers = {};
-                this.config = { headers };
-            } else if (this.config.headers) {
-                headers = this.config.headers;
-            } else {
-                headers = {};
-                this.config.headers = headers;
-            }
-        } else {
-            headers = writeHeaders;
-        }
+        const headers = writeHeaders ?? this.getHeaders();
 
         // Authentication header value
         const value = token ? `${schemeName} ${token}` : token;
 
         // Set
-        this.setHeaderValue(headers, 'Authorization', value);
+        this.setHeaderValue('Authorization', value, headers);
     }
 
     /**
@@ -170,7 +163,7 @@ export abstract class ApiBase<R> implements IApi<R> {
                             if (!localContentType)
                                 localContentType = 'application/xml';
                         }
-                        this.setContentType(headers, localContentType);
+                        this.setContentType(localContentType, headers);
                         return [data];
                     }
 
@@ -183,7 +176,7 @@ export abstract class ApiBase<R> implements IApi<R> {
                         // Object type, default to JSON
                         if (!localContentType)
                             localContentType = 'application/json';
-                        this.setContentType(headers, localContentType);
+                        this.setContentType(localContentType, headers);
 
                         return [JSON.stringify(data)];
                     }
@@ -191,7 +184,7 @@ export abstract class ApiBase<R> implements IApi<R> {
                     // Default form data
                     if (!localContentType)
                         localContentType = 'application/x-www-form-urlencoded';
-                    this.setContentType(headers, localContentType);
+                    this.setContentType(localContentType, headers);
 
                     // FileList, check availibility
                     if (
@@ -271,14 +264,14 @@ export abstract class ApiBase<R> implements IApi<R> {
      * @param headers Headers
      */
     protected getContentType(headers: HeadersInit): string | null {
-        return this.getHeaderValue(headers, 'Content-Type');
+        return this.getHeaderValue(headers, ApiBase.ContentTypeKey);
     }
 
     /**
      * Get content type and charset
      * @param headers Headers
      */
-    public getContentTypeAndCharset(headers: HeadersInit): [string, string?] {
+    getContentTypeAndCharset(headers: HeadersInit): [string, string?] {
         const contentType = this.getContentType(headers);
         if (contentType) {
             const parts = contentType.split(';');
@@ -291,10 +284,28 @@ export abstract class ApiBase<R> implements IApi<R> {
     }
 
     /**
+     * Get headers
+     * @returns Headers
+     */
+    protected getHeaders() {
+        let headers: HeadersInit;
+        if (this.config == null) {
+            headers = {};
+            this.config = { headers };
+        } else if (this.config.headers) {
+            headers = this.config.headers;
+        } else {
+            headers = {};
+            this.config.headers = headers;
+        }
+        return headers;
+    }
+
+    /**
      * Get content type
      * @param headers Headers
      */
-    public getHeaderValue(headers: HeadersInit, key: string): string | null {
+    getHeaderValue(headers: HeadersInit, key: string): string | null {
         // String array
         if (Array.isArray(headers)) {
             const index = headers.findIndex((item) => {
@@ -322,32 +333,48 @@ export abstract class ApiBase<R> implements IApi<R> {
     }
 
     /**
-     * Set content type
+     * Set content language
+     * @param language Content language
      * @param headers Headers
+     */
+    setContentLanguage(
+        language: string | null | undefined,
+        headers?: HeadersInit
+    ) {
+        this.setHeaderValue('Content-Language', language, headers);
+    }
+
+    /**
+     * Set content type
      * @param contentType New content type
+     * @param headers Headers
      */
     protected setContentType(
-        headers: HeadersInit,
-        contentType: string | null | undefined
+        contentType: string | null | undefined,
+        headers?: HeadersInit
     ): void {
         let value = contentType;
         if (value && !value.includes('charset=')) {
             // Test charset
             value += `; charset=${this.charset}`;
         }
-        this.setHeaderValue(headers, 'Content-Type', value);
+        this.setHeaderValue(ApiBase.ContentTypeKey, value, headers);
     }
 
     /**
-     * Set content type
-     * @param headers Headers
-     * @param contentType New content type
+     * Set header value
+     * @param key Header name
+     * @param value Header value
+     * @param headers Optional headers to lookup
      */
-    protected setHeaderValue(
-        headers: HeadersInit,
+    setHeaderValue(
         key: string,
-        value: string | null | undefined
+        value: string | null | undefined,
+        headers?: HeadersInit
     ): void {
+        // Default headers
+        if (headers == null) headers = this.getHeaders();
+
         // String array
         if (Array.isArray(headers)) {
             const index = headers.findIndex((item) => {
@@ -478,6 +505,14 @@ export abstract class ApiBase<R> implements IApi<R> {
         // On response callback
         if (response && this.onResponse) {
             this.onResponse(data, response);
+        }
+    }
+
+    // Dispatch response callback
+    private dispatchCompleteCallback(data: IApiData, response?: R) {
+        // On complete callback
+        if (this.onComplete) {
+            this.onComplete(data, response);
         }
     }
 
@@ -622,6 +657,9 @@ export abstract class ApiBase<R> implements IApi<R> {
             )
         );
 
+        // Complete API call
+        this.dispatchCompleteCallback(apiData, response);
+
         if (error || response == null) {
             // Error occured
             const localError = error || new Error('No Response Error');
@@ -676,7 +714,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      * Transform original response to unified object
      * @param response Original response
      */
-    public abstract transformResponse(response: R): IApiResponse;
+    abstract transformResponse(response: R): IApiResponse;
 
     /**
      * Delete API

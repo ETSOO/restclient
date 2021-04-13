@@ -111,6 +111,7 @@ if(customer == null) {
 |lastError|Last error for track|
 |onError|Error occured callback|
 |onRequest|Before request callback|
+|onComplete|After request completed but before onResponse|
 |onResponse|After response callback|
 
 ## Methods
@@ -156,6 +157,28 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
         data?: ApiRequestData,
         payload?: IApiPayload<T, R>
     ): Promise<T | undefined>;
+
+    /**
+     * Set content language
+     * @param language Content language
+     * @param headers Headers
+     */
+    setContentLanguage(
+        language: string | null | undefined,
+        headers?: HeadersInit
+    ): void;
+
+    /**
+     * Set header value
+     * @param key Header name
+     * @param value Header value
+     * @param headers Optional headers to lookup
+     */
+    setHeaderValue(
+        key: string,
+        value: string | null | undefined,
+        headers?: HeadersInit
+    ): void;
 
     /**
      * Transform the original response to a unified object

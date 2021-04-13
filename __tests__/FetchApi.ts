@@ -38,10 +38,10 @@ class FetchApiHelper extends FetchApi {
      * @param contentType New content type
      */
     setContentType(
-        headers: HeadersInit,
-        contentType: string | null | undefined
+        contentType: string | null | undefined,
+        headers?: HeadersInit
     ): void {
-        super.setContentType(headers, contentType);
+        super.setContentType(contentType, headers);
     }
 
     /**
@@ -225,7 +225,7 @@ describe('setContentType/getContentType/getContentTypeAndCharset tests', () => {
     // Names are case insensitive
     test('name case insensitive', () => {
         // Act
-        api.setContentType(headers, 'application/json');
+        api.setContentType('application/json', headers);
 
         // Assert
         expect(Object.keys(headers).length).toBe(2);
