@@ -1,5 +1,5 @@
 import axios, { Method, AxiosResponse, ResponseType } from 'axios';
-import { DomUtils } from '@etsoo/shared';
+import { DataTypes, DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
 
@@ -59,6 +59,38 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
             url
         };
         return axios(requestBody);
+    }
+
+    /**
+     * Get Json data directly
+     * @param url URL
+     * @returns Json data
+     */
+    getJson<T = DataTypes.ReadonlyData>(url: string) {
+        return new Promise<T>((resolve, reject) => {
+            // Get
+            axios.get(url).then((response) => {
+                // Check validation
+                if (response.status != 200) {
+                    reject('Invalid Status');
+                    return;
+                }
+
+                // No data
+                if (response.data == null || response.data === '') {
+                    reject('No Data');
+                }
+
+                // Convert possible string to Json object
+                const data =
+                    typeof response.data === 'string'
+                        ? JSON.parse(response.data)
+                        : response.data;
+
+                // Resolve
+                resolve(data as T);
+            });
+        });
     }
 
     /**

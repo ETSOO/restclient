@@ -24,6 +24,31 @@ export enum ApiAuthorizationScheme {
 }
 
 /**
+ * IP data
+ */
+export interface IPData {
+    /**
+     * IP address
+     */
+    ip: string;
+
+    /**
+     * Country name, like New Zealand
+     */
+    country: string;
+
+    /**
+     * Country code, like NZ
+     */
+    countryCode: string;
+
+    /**
+     * Timezone, like Pacific/Auckland
+     */
+    timezone?: string;
+}
+
+/**
  * API configures interface
  */
 export interface IApiConfig {
@@ -184,7 +209,7 @@ export interface IApiResponseHandler<R> {
 /**
  * API complete handler
  */
- export interface IApiCompleteHandler<R> {
+export interface IApiCompleteHandler<R> {
     (data: IApiData, response?: R): void;
 }
 
@@ -347,6 +372,13 @@ export interface IApi<R = any> {
         data?: ApiRequestData,
         payload?: IApiPayload<T, R>
     ): Promise<T | undefined>;
+
+    /**
+     * Get Json data directly
+     * @param url URL
+     * @returns Json data
+     */
+    getJson<T = DataTypes.ReadonlyData>(url: string): Promise<T>;
 
     /**
      * Head API

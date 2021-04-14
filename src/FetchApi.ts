@@ -1,4 +1,5 @@
-import { DomUtils } from '@etsoo/shared';
+import { DataTypes, DomUtils } from '@etsoo/shared';
+import { getConstantValue } from 'typescript';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
 
@@ -31,6 +32,35 @@ export class FetchApi extends ApiBase<Response> {
             method: ApiMethod[method]
         };
         return fetch(url, requestBody);
+    }
+
+    /**
+     * Get Json data directly
+     * @param url URL
+     * @returns Json data
+     */
+    getJson<T = DataTypes.ReadonlyData>(url: string) {
+        return new Promise<T>((resolve, reject) => {
+            // Fetch
+            fetch(url).then((response) => {
+                // Check validation
+                if (!response.ok) {
+                    reject('Invalid Status');
+                    return;
+                }
+
+                // Json
+                response.json().then((json) => {
+                    if (json == null) {
+                        reject('No Data');
+                        return;
+                    }
+
+                    // Resolve
+                    resolve(json as T);
+                });
+            });
+        });
     }
 
     /**

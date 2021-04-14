@@ -15,7 +15,8 @@ import {
     ApiResponseType,
     IApiResponse,
     ApiAuthorizationScheme,
-    IApiCompleteHandler
+    IApiCompleteHandler,
+    IPData
 } from './IApi';
 import { ApiError } from './ApiError';
 import { ApiDataError } from './ApiDataError';
@@ -107,6 +108,41 @@ export abstract class ApiBase<R> implements IApi<R> {
     }
 
     /**
+     * Detect IP data
+     * @returns IP data
+     */
+    async detectIP() {
+        // Endpoints for detection
+        const endpoints = [
+            'https://extreme-ip-lookup.com/json/',
+            'https://geoip-db.com/json/',
+            'http://ip-api.com/json'
+        ];
+
+        // Any success result
+        const data = await Promise.any(endpoints.map((p) => this.getJson(p)));
+        if (data == null) return undefined;
+
+        // IP data
+        const ipData: IPData = {
+            ip: data.query ?? data.IPv4 ?? data.IPv6,
+            country: data.country ?? data.country_name,
+            countryCode: data.countryCode ?? data.country_code,
+            timezone: data.timezone
+        };
+
+        // If Intl supported
+        if (
+            typeof Intl === 'object' &&
+            typeof Intl.DateTimeFormat === 'function'
+        )
+            ipData.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        // Return
+        return ipData;
+    }
+
+    /**
      * Build API url
      * @param url API url
      */
@@ -125,6 +161,12 @@ export abstract class ApiBase<R> implements IApi<R> {
         }
         return formFiles;
     }
+
+    /**
+     * Get Json data directly
+     * @param url URL
+     */
+    abstract getJson<T = DataTypes.ReadonlyData>(url: string): Promise<T>;
 
     /**
      * Format posted data

@@ -145,6 +145,13 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
     getHeaderValue(headers: HeadersInit, key: string): string | null;
 
     /**
+     * Get Json data directly
+     * @param url URL
+     * @returns Json data
+     */
+    getJson<T = DataTypes.ReadonlyData>(url: string): Promise<T>;
+
+    /**
      * Request to API
      * @param method Method
      * @param url API URL

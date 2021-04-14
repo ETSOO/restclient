@@ -287,6 +287,31 @@ describe('GET tests', () => {
         expect(failResult).toBeUndefined();
         expect(api.lastError?.data.url).toBe('/Customer/CountryList');
     });
+
+    it('detectIP tests', async () => {
+        // Mock the response data
+        fetchMock.mockResponse(
+            JSON.stringify({
+                status: 'success',
+                country: 'New Zealand',
+                countryCode: 'NZ',
+                region: 'AUK',
+                regionName: 'Auckland',
+                city: 'Auckland',
+                zip: '1010',
+                lat: -36.8506,
+                lon: 174.7679,
+                timezone: 'Pacific/Auckland',
+                isp: 'CallPlus Services Limited',
+                org: 'CallPlus Services Limited',
+                as: 'AS9790 Vocus Group NZ',
+                query: '101.98.49.5'
+            })
+        );
+
+        const data = await api.getJson('http://ip-api.com/json');
+        expect(data).toHaveProperty('query', '101.98.49.5');
+    });
 });
 
 describe('POST tests', () => {
