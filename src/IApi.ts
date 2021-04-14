@@ -338,6 +338,12 @@ export interface IApi<R = any> {
     ): void;
 
     /**
+     * Detect IP data
+     * @returns IP data
+     */
+    detectIP(): Promise<IPData | undefined>;
+
+    /**
      * Get content type and charset
      * @param headers Headers
      */
