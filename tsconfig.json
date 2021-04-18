@@ -5,7 +5,7 @@
         "module": "ESNext",
         "moduleResolution": "node",
         "isolatedModules": true,
-        "lib": ["DOM", "ESNext", "DOM.Iterable"],
+        "lib": ["DOM", "DOM.Iterable", "ESNext"],
         "outDir": "./lib",
         "noEmit": false,
         "declaration": true,

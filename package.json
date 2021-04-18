@@ -1,6 +1,6 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.0.30",
+    "version": "1.0.31",
     "description": "TypeScript REST client supports Axios and Fetch",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -50,7 +50,9 @@
     "devDependencies": {
         "@babel/cli": "^7.13.14",
         "@babel/core": "^7.13.15",
+        "@babel/plugin-transform-runtime": "^7.13.15",
         "@babel/preset-env": "^7.13.15",
+        "@babel/runtime-corejs3": "^7.13.10",
         "@types/jest": "^26.0.22",
         "@typescript-eslint/eslint-plugin": "^4.22.0",
         "@typescript-eslint/parser": "^4.22.0",
