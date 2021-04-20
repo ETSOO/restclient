@@ -120,7 +120,21 @@ export abstract class ApiBase<R> implements IApi<R> {
         ];
 
         // Any success result
-        const data = await Promise.any(endpoints.map((p) => this.getJson(p)));
+        let data: Readonly<DataTypes.DynamicData> | undefined;
+        if (typeof Promise.any === 'function') {
+            data = await Promise.any(endpoints.map((p) => this.getJson(p)));
+        } else {
+            data = await new Promise<Readonly<DataTypes.DynamicData>>(
+                (resolve) => {
+                    endpoints.forEach((p) => {
+                        this.getJson(p).then((result) => {
+                            resolve(result);
+                        });
+                    });
+                }
+            );
+        }
+
         if (data == null) return undefined;
 
         // IP data
