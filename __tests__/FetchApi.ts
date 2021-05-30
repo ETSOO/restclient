@@ -6,7 +6,8 @@ import {
     IApiConfig,
     ApiResponseType,
     ApiRequestData,
-    ApiAuthorizationScheme
+    ApiAuthorizationScheme,
+    IApiPayload
 } from '../src/IApi';
 
 /**
@@ -363,13 +364,20 @@ describe('POST tests', () => {
         // Local authorization
         api.authorize(ApiAuthorizationScheme.Basic, 'basic', config.headers);
 
+        // Payload
+        const payload: IApiPayload<CountryItem[], any> = {
+            params: { id: 2, name: 'test' },
+            config
+        };
+
         const okResult = await localApi.post<CountryItem[]>(
             '/Customer/CountryList',
             { id: 1 },
-            { params: { id: 2, name: 'test' }, config }
+            payload
         );
 
         // Assert
+        expect(payload.response).not.toBeNull();
         expect(okResult).toBeDefined();
         expect(okResult?.length).toBe(2);
     });

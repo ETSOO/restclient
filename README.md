@@ -84,20 +84,25 @@ client.onError = (error) => {
 }
 
 // Read one customer
-const customer = await client.get<Customer>('/api/customer/1', undefined, {
+var payload: IApiPayload<Customer, any> = {
     // Current call's error handling
     onError = (error) => {
         console.log(error);
         // return false to prevent further error handling
         return false;
     }
-});
+}
+
+const customer = await client.get<Customer>('/api/customer/1', undefined, payload);
 if(customer == null) {
     // Error found
     // client.lastError cache the last error
     // For accurate check, validate client.lastError.data.url
     return;
 }
+
+// Now call payload.response to access headers
+// client.transformResponse(payload.response) to get a standard IApiResponse
 ```
 
 ## Properties

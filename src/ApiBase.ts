@@ -715,6 +715,9 @@ export abstract class ApiBase<R> implements IApi<R> {
             apiData.depth = 1;
             this.handleError(localError, apiData, response, onError);
         } else {
+            // Hold a reference
+            if (payload != null) payload.response = response;
+
             // Dispatch response callback
             this.dispatchResponseCallback(apiData, response);
 

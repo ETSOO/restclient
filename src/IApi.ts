@@ -237,42 +237,47 @@ export interface IApiPayload<T, R> {
     /**
      * Content type
      */
-    contentType?: string;
+    readonly contentType?: string;
 
     /**
      * Error handler
      */
-    onError?: IApiErrorHandler<R>;
+    readonly onError?: IApiErrorHandler<R>;
 
     /**
      * Configures
      */
-    config?: IApiConfig;
+    readonly config?: IApiConfig;
 
     /**
      * Default value
      */
-    defaultValue?: T;
+    readonly defaultValue?: T;
 
     /**
      * URL parameters
      */
-    params?: ApiParams;
+    readonly params?: ApiParams;
 
     /**
      * Data parser
      */
-    parser?: IApiParser<T>;
+    readonly parser?: IApiParser<T>;
+
+    /**
+     * Current response
+     */
+    response?: R;
 
     /**
      * Response data type
      */
-    responseType?: ApiResponseType;
+    readonly responseType?: ApiResponseType;
 
     /**
      * Show loading indicator
      */
-    showLoading?: boolean;
+    readonly showLoading?: boolean;
 }
 
 /**
