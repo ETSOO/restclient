@@ -145,13 +145,6 @@ export abstract class ApiBase<R> implements IApi<R> {
             timezone: data.timezone
         };
 
-        // If Intl supported
-        if (
-            typeof Intl === 'object' &&
-            typeof Intl.DateTimeFormat === 'function'
-        )
-            ipData.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
         // Return
         return ipData;
     }
