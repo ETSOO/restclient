@@ -20,7 +20,7 @@ export class FetchApi extends ApiBase<Response> {
         url: string,
         headers: HeadersInit,
         data: any,
-        _responseType: ApiResponseType,
+        _responseType: ApiResponseType | undefined,
         rest: { [key: string]: any }
     ): Promise<Response> {
         // Request body
@@ -69,7 +69,7 @@ export class FetchApi extends ApiBase<Response> {
      */
     protected responseData(
         response: Response,
-        responseType: ApiResponseType
+        responseType?: ApiResponseType
     ): Promise<any> {
         // Content type
         const [contentType] = this.getContentTypeAndCharset(response.headers);

@@ -124,7 +124,10 @@ mockedAxios.mockImplementation((config) => {
         getVerb || initData
             ? {
                   data,
-                  headers: localConfig.headers,
+                  headers: {
+                      ...localConfig.headers,
+                      ...{ 'Content-type': 'application/json' }
+                  },
                   config: localConfig,
                   status: 200,
                   statusText: 'OK'

@@ -255,7 +255,9 @@ describe('GET tests', () => {
         ];
 
         // Mock the response data
-        fetchMock.mockResponse(JSON.stringify(data));
+        fetchMock.mockResponse(JSON.stringify(data), {
+            headers: { 'Content-type': 'application/json' }
+        });
 
         // Act
         const okResult = await api.get<CountryItem[]>('/Customer/CountryList');

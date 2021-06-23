@@ -41,13 +41,14 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
         url: string,
         headers: HeadersInit,
         data: any,
-        responseType: ApiResponseType,
+        responseType: ApiResponseType | undefined,
         rest: { [key: string]: any }
     ): Promise<AxiosResponse> {
         // Transform response type
-        const localResponseType = ApiResponseType[
-            responseType
-        ].toLowerCase() as ResponseType;
+        const localResponseType =
+            responseType == null
+                ? undefined
+                : (ApiResponseType[responseType].toLowerCase() as ResponseType);
 
         // Request body
         const requestBody = {
@@ -100,7 +101,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
      */
     protected responseData(
         response: AxiosResponse,
-        responseType: ApiResponseType
+        responseType?: ApiResponseType
     ): Promise<any> {
         const { data } = response;
         if (data) {

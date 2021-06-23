@@ -124,7 +124,7 @@ export interface IApiData {
     /**
      * Response data type
      */
-    responseType: ApiResponseType;
+    responseType?: ApiResponseType;
 
     /**
      * Show loading indicator
@@ -302,7 +302,7 @@ export interface IApi<R = any> {
     /**
      * Default response data type
      */
-    defaultResponseType: ApiResponseType;
+    defaultResponseType?: ApiResponseType;
 
     /**
      * Last error

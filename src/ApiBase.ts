@@ -48,7 +48,7 @@ export abstract class ApiBase<R> implements IApi<R> {
     /**
      * Default response data type
      */
-    defaultResponseType: ApiResponseType = ApiResponseType.Json;
+    defaultResponseType?: ApiResponseType;
 
     private lastErrorPrivate?: ApiDataError<R>;
 
@@ -472,7 +472,7 @@ export abstract class ApiBase<R> implements IApi<R> {
         url: string,
         headers: HeadersInit,
         data: any,
-        responseType: ApiResponseType,
+        responseType: ApiResponseType | undefined,
         rest: { [key: string]: any }
     ): Promise<R>;
 
@@ -483,7 +483,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      */
     protected abstract responseData(
         response: R,
-        responseType: ApiResponseType
+        responseType?: ApiResponseType
     ): Promise<any>;
 
     /**
