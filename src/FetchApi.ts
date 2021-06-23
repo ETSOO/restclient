@@ -1,5 +1,4 @@
 import { DataTypes, DomUtils } from '@etsoo/shared';
-import { getConstantValue } from 'typescript';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
 

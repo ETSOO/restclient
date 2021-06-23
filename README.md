@@ -217,6 +217,7 @@ When you call any API, pass additional properties with the payload parameter.
 |defaultValue|Default value, like [] for array return|
 |params|URL parameters|
 |parser|Current API response data parser|
+|response|Request response object|
 |responseType|Specify response data type|
 |showLoading|Whether to show loading bar|
 

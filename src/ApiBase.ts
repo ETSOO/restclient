@@ -231,8 +231,9 @@ export abstract class ApiBase<R> implements IApi<R> {
                     }
 
                     // Default form data
+                    // Previous was application/x-www-form-urlencoded
                     if (!localContentType)
-                        localContentType = 'application/x-www-form-urlencoded';
+                        localContentType = 'multipart/form-data';
                     this.setContentType(localContentType, headers);
 
                     // FileList, check availibility
