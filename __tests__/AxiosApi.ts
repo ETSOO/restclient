@@ -83,6 +83,7 @@ class AxiosApiHelper extends AxiosApi {
 interface CountryItem {
     id: string;
     name: string;
+    creation: Date;
 }
 
 // Enable fetch mocks to avoid Headers/fetch is not defined
@@ -100,6 +101,11 @@ const mockedAxios = mocked<{ (config: AxiosRequestConfig): AxiosPromise }>(
     axios
 );
 
+const setupData = [
+    { id: 'CN', name: 'China', creation: '1949-10-1' },
+    { id: 'NZ', name: 'New Zealand', creation: '1907-9-26' }
+];
+
 // Mocking implementation
 mockedAxios.mockImplementation((config) => {
     const localConfig = config || ({} as AxiosRequestConfig);
@@ -112,11 +118,7 @@ mockedAxios.mockImplementation((config) => {
     let { data } = localConfig;
     const initData = !!data;
     if (!initData) {
-        if (getVerb)
-            data = [
-                { id: 'CN', name: 'China' },
-                { id: 'NZ', name: 'New Zealand' }
-            ];
+        if (getVerb) data = setupData;
         else data = { title: 'Method Not Allowed' };
     }
 
@@ -176,7 +178,11 @@ describe('Protected methods tests', () => {
         expect(api.responseData(response, ApiResponseType.Json)).toBeDefined();
 
         // Response data matches
-        expect(response.data).toContainEqual({ id: 'CN', name: 'China' });
+        expect(response.data).toContainEqual({
+            id: 'CN',
+            name: 'China',
+            creation: '1949-10-1'
+        });
     });
 
     test('Tests for formatData', () => {
@@ -233,14 +239,15 @@ describe('POST tests', () => {
         // Act
         const okResult = await api.post<CountryItem[]>(
             '/Customer/CountryList',
-            JSON.stringify([
-                { id: 'CN', name: 'China' },
-                { id: 'NZ', name: 'New Zealand' }
-            ])
+            JSON.stringify(setupData)
         );
 
         // Assert
         expect(okResult).toBeDefined();
-        expect(okResult?.length).toBe(2);
+        if (okResult != null) {
+            expect(okResult.length).toBe(2);
+            const isDate = okResult[0].creation instanceof Date;
+            expect(isDate).toBeTruthy();
+        }
     });
 });

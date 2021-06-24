@@ -117,6 +117,7 @@ class FetchApiHelper extends FetchApi {
 interface CountryItem {
     id: string;
     name: string;
+    creation: Date;
 }
 
 // Enable fetch mocks to avoid Headers/fetch is not defined
@@ -137,14 +138,14 @@ const api = new FetchApiHelper();
 // "testEnvironment": "node"
 api.baseUrl = 'http://localhost:19333';
 
+// Arrange
+const data = [
+    { id: 'CN', name: 'China', creation: '1949-10-1' },
+    { id: 'NZ', name: 'New Zealand', creation: '1907-9-26' }
+];
+
 describe('Protected methods tests', () => {
     it('createResponse, responseData, responseOk', async () => {
-        // Arrange
-        const data = [
-            { id: 'CN', name: 'China' },
-            { id: 'NZ', name: 'New Zealand' }
-        ];
-
         // Mock the response data
         fetchMock.mockResponse(JSON.stringify(data));
 
@@ -169,7 +170,11 @@ describe('Protected methods tests', () => {
         expect(result).toBeDefined();
 
         // Response data matches
-        expect(result).toContainEqual({ id: 'CN', name: 'China' });
+        expect(result).toContainEqual({
+            id: 'CN',
+            name: 'China',
+            creation: new Date('1949-10-1')
+        });
     });
 
     test('Tests for formatData', () => {
@@ -248,12 +253,6 @@ describe('setContentType/getContentType/getContentTypeAndCharset tests', () => {
 
 describe('GET tests', () => {
     test('OK result', async () => {
-        // Arrange
-        const data = [
-            { id: 'CN', name: 'China' },
-            { id: 'NZ', name: 'New Zealand' }
-        ];
-
         // Mock the response data
         fetchMock.mockResponse(JSON.stringify(data), {
             headers: { 'Content-type': 'application/json' }
@@ -321,12 +320,6 @@ describe('POST tests', () => {
     // For asyn/await call
     // Or without it, add a done parameter here
     test('OK result', async () => {
-        // Arrange
-        const data = [
-            { id: 'CN', name: 'China' },
-            { id: 'NZ', name: 'New Zealand' }
-        ];
-
         // Api client
         const localApi = new FetchApi();
 
@@ -381,6 +374,11 @@ describe('POST tests', () => {
         // Assert
         expect(payload.response).not.toBeNull();
         expect(okResult).toBeDefined();
-        expect(okResult?.length).toBe(2);
+
+        if (okResult != null) {
+            expect(okResult.length).toBe(2);
+            const isDate = okResult[0].creation instanceof Date;
+            expect(isDate).toBeTruthy();
+        }
     });
 });

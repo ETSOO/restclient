@@ -1,4 +1,4 @@
-import { DataTypes, DomUtils } from '@etsoo/shared';
+import { DataTypes, DateUtils, DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
 
@@ -71,17 +71,11 @@ export class FetchApi extends ApiBase<Response> {
         response: Response,
         responseType?: ApiResponseType
     ): Promise<any> {
+        // 204 = No content
+        if (response.status === 204) return Promise.resolve('');
+
         // Content type
         const [contentType] = this.getContentTypeAndCharset(response.headers);
-
-        if (
-            responseType === ApiResponseType.Json ||
-            DomUtils.isJSONContentType(contentType)
-        ) {
-            // 204 = No content
-            if (response.status === 204) return Promise.resolve('');
-            return response.json();
-        }
 
         if (
             responseType === ApiResponseType.Blob ||
@@ -114,7 +108,18 @@ export class FetchApi extends ApiBase<Response> {
             return Promise.resolve(response.body);
 
         // Default is text
-        return response.text();
+        const text = response.text();
+
+        if (
+            responseType === ApiResponseType.Json ||
+            DomUtils.isJSONContentType(contentType)
+        ) {
+            return text.then((value) =>
+                JSON.parse(value, DateUtils.jsonParser)
+            );
+        }
+
+        return text;
     }
 
     /**

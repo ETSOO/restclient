@@ -1,5 +1,5 @@
 import axios, { Method, AxiosResponse, ResponseType } from 'axios';
-import { DataTypes, DomUtils } from '@etsoo/shared';
+import { DataTypes, DateUtils, DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
 
@@ -119,7 +119,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
                 if (response.status === 204) return Promise.resolve('');
 
                 // Convert string to JSON object, rare
-                return Promise.resolve(JSON.parse(data));
+                return Promise.resolve(JSON.parse(data, DateUtils.jsonParser));
             }
         }
         return Promise.resolve(data);
