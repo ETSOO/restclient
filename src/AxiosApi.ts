@@ -116,7 +116,8 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
                 typeof data === 'string'
             ) {
                 // 204 = No content
-                if (response.status === 204) return Promise.resolve('');
+                if (response.status === 204 || data == null || data === '')
+                    return Promise.resolve('');
 
                 // Convert string to JSON object, rare
                 return Promise.resolve(JSON.parse(data, DateUtils.jsonParser));

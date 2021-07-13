@@ -252,6 +252,31 @@ describe('setContentType/getContentType/getContentTypeAndCharset tests', () => {
 });
 
 describe('GET tests', () => {
+    test('Empty result', async () => {
+        // Mock the response data
+        fetchMock.mockResponse('', {
+            headers: { 'Content-type': 'application/json' }
+        });
+
+        // Act
+        const emptyResult = await api.get<CountryItem[]>(
+            '/Customer/CountryList'
+        );
+
+        // Assert
+        expect(emptyResult).toBeUndefined();
+
+        // Act
+        const emptyArrayResult = await api.get<CountryItem[]>(
+            '/Customer/CountryList',
+            undefined,
+            { defaultValue: [] }
+        );
+
+        // Assert
+        expect(emptyArrayResult?.length).toBe(0);
+    });
+
     test('OK result', async () => {
         // Mock the response data
         fetchMock.mockResponse(JSON.stringify(data), {

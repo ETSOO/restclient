@@ -114,9 +114,10 @@ export class FetchApi extends ApiBase<Response> {
             responseType === ApiResponseType.Json ||
             DomUtils.isJSONContentType(contentType)
         ) {
-            return text.then((value) =>
-                JSON.parse(value, DateUtils.jsonParser)
-            );
+            return text.then((value) => {
+                if (value == null || value === '') return '';
+                return JSON.parse(value, DateUtils.jsonParser);
+            });
         }
 
         return text;
