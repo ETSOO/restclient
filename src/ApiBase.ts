@@ -216,6 +216,11 @@ export abstract class ApiBase<R> implements IApi<R> {
                         return [data];
                     }
 
+                    // Form data
+                    if (data instanceof FormData) {
+                        return [data];
+                    }
+
                     // JSON
                     if (
                         data.constructor === Object ||
@@ -293,14 +298,14 @@ export abstract class ApiBase<R> implements IApi<R> {
 
                 // config value
                 const configValue = apiConfig[key];
-                if (configValue) {
-                    if (typeof configValue === 'object') {
-                        // merge object
-                        // eslint-disable-next-line no-param-reassign
-                        apiConfig[key] = { ...defaultValue, ...configValue };
-                    }
-                } else {
-                    // eslint-disable-next-line no-param-reassign
+
+                if (typeof defaultValue === 'object') {
+                    // Is object, copy and merge
+                    apiConfig[key] = {
+                        ...defaultValue,
+                        ...(configValue ?? {})
+                    };
+                } else if (!Object.keys(apiConfig).some((k) => k === key)) {
                     apiConfig[key] = defaultValue;
                 }
             });
