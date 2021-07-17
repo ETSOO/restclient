@@ -1,11 +1,18 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.0.42",
+    "version": "1.0.43",
     "description": "TypeScript REST client supports Axios and Fetch",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
+    "main": "lib/mjs/index.js",
+    "module": "lib/cjs/index.js",
+    "types": "lib/mjs/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./lib/mjs/index.js",
+            "require": "./lib/cjs/index.js"
+        }
+    },
     "scripts": {
-        "build": "tsc",
+        "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
         "format": "prettier --write src/**/*.ts",
         "lint": "eslint --ext .ts,.tsx src/",
         "test": "jest",
@@ -43,8 +50,10 @@
     },
     "homepage": "https://github.com/ETSOO/restclient#readme",
     "dependencies": {
-        "@etsoo/shared": "^1.0.28",
+        "@etsoo/shared": "^1.0.32",
+        "@types/node-fetch": "^2.5.11",
         "axios": "^0.21.1",
+        "node-fetch": "^2.6.1",
         "typescript": "^4.3.5"
     },
     "devDependencies": {

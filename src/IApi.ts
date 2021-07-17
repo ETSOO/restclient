@@ -24,6 +24,22 @@ export enum ApiAuthorizationScheme {
 }
 
 /**
+ * Extended headers type
+ */
+export type HeadersAll = HeadersInit | Iterable<[string, string]>;
+
+/**
+ * Is iterable or not
+ * @param headers Headers
+ * @returns Result
+ */
+export function isIterable<T>(
+    headers: HeadersInit | Iterable<T>
+): headers is Iterable<T> {
+    return Symbol.iterator in headers;
+}
+
+/**
  * IP data
  */
 export interface IPData {
@@ -60,7 +76,7 @@ export interface IApiConfig {
     /**
      * Headers
      */
-    headers?: HeadersInit;
+    headers?: HeadersAll;
 }
 
 /**
@@ -109,7 +125,7 @@ export interface IApiData {
     /**
      * Request headers
      */
-    headers: HeadersInit;
+    headers: HeadersAll;
 
     /**
      * API verb
@@ -174,7 +190,7 @@ export interface IApiResponse {
     /**
      * Response headers
      */
-    headers: HeadersInit;
+    headers: HeadersAll;
 
     /**
      * OK status
@@ -339,7 +355,7 @@ export interface IApi<R = any> {
     authorize(
         scheme: ApiAuthorizationScheme | string,
         token: string | undefined,
-        writeHeaders?: HeadersInit
+        writeHeaders?: HeadersAll
     ): void;
 
     /**
@@ -352,13 +368,13 @@ export interface IApi<R = any> {
      * Get content type and charset
      * @param headers Headers
      */
-    getContentTypeAndCharset(headers: HeadersInit): [string, string?];
+    getContentTypeAndCharset(headers: HeadersAll): [string, string?];
 
     /**
      * Get content type
      * @param headers Headers
      */
-    getHeaderValue(headers: HeadersInit, key: string): string | null;
+    getHeaderValue(headers: HeadersAll, key: string): string | null;
 
     /**
      * Delete API
@@ -472,7 +488,7 @@ export interface IApi<R = any> {
      */
     setContentLanguage(
         language: string | null | undefined,
-        headers?: HeadersInit
+        headers?: HeadersAll
     ): void;
 
     /**
@@ -484,7 +500,7 @@ export interface IApi<R = any> {
     setHeaderValue(
         key: string,
         value: string | null | undefined,
-        headers?: HeadersInit
+        headers?: HeadersAll
     ): void;
 
     /**

@@ -5,7 +5,7 @@
 - axios: https://github.com/axios/axios, based on XHR: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 - fetch: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
-ESLint + AirbnbBase + Prettier, Jest(ts-jest) applied. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
+ESLint + AirbnbBase + Prettier, Jest(ts-jest) applied, supports CommonJs and ESM. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
 
 ## Installing
 
@@ -26,6 +26,7 @@ $ yarn add @etsoo/restclient
 ### Initialization
 
 - Depending on the envioronment, fetch first. If fetch is not supported, use axios.
+- Under node, node-fetch (https://github.com/node-fetch/node-fetch) and formdata-node (https://github.com/octet-stream/form-data) will be applied.
 
 ```ts
 import { createClient, IApi } from '@etsoo/restclient';
@@ -90,7 +91,9 @@ var payload: IApiPayload<Customer, any> = {
         console.log(error);
         // return false to prevent further error handling
         return false;
-    }
+    },
+    // Pass default value to distinguish return value with error or undefined
+    defaultValue: {}
 }
 
 const customer = await client.get<Customer>('/api/customer/1', undefined, payload);
@@ -214,7 +217,7 @@ When you call any API, pass additional properties with the payload parameter.
 |contentType|Specify data type to send, like 'application/json'|
 |onError|Current API call error callback|
 |config|Current API config. See axios/Request Config or fetch/RequestInit|
-|defaultValue|Default value, like [] for array return|
+|defaultValue|Default value, like [] for array return to distinguish undefined or error return|
 |params|URL parameters|
 |parser|Current API response data parser|
 |response|Request response object|

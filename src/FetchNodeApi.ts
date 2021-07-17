@@ -7,11 +7,12 @@ import {
     IApiResponse,
     isIterable
 } from './IApi';
+import fetch, { Headers, Response } from 'node-fetch';
 
 /**
- * Fetch API
+ * Fetch Node API
  */
-export class FetchApi extends ApiBase<Response> {
+export class FetchNodeApi extends ApiBase<Response> {
     /**
      * Create response
      * @param method Method

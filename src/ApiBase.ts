@@ -16,7 +16,9 @@ import {
     IApiResponse,
     ApiAuthorizationScheme,
     IApiCompleteHandler,
-    IPData
+    IPData,
+    HeadersAll,
+    isIterable
 } from './IApi';
 import { ApiError } from './ApiError';
 import { ApiDataError } from './ApiDataError';
@@ -89,7 +91,7 @@ export abstract class ApiBase<R> implements IApi<R> {
     authorize(
         scheme: ApiAuthorizationScheme | string,
         token: string | undefined,
-        writeHeaders?: HeadersInit
+        writeHeaders?: HeadersAll
     ): void {
         // Scheme name
         const schemeName =
@@ -185,7 +187,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      */
     protected formatData(
         method: ApiMethod,
-        headers: HeadersInit,
+        headers: HeadersAll,
         params: URLSearchParams,
         data?: ApiRequestData,
         contentType?: string
@@ -316,7 +318,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      * Get content type
      * @param headers Headers
      */
-    protected getContentType(headers: HeadersInit): string | null {
+    protected getContentType(headers: HeadersAll): string | null {
         return this.getHeaderValue(headers, ApiBase.ContentTypeKey);
     }
 
@@ -324,7 +326,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      * Get content type and charset
      * @param headers Headers
      */
-    getContentTypeAndCharset(headers: HeadersInit): [string, string?] {
+    getContentTypeAndCharset(headers: HeadersAll): [string, string?] {
         const contentType = this.getContentType(headers);
         if (contentType) {
             const parts = contentType.split(';');
@@ -341,7 +343,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      * @returns Headers
      */
     protected getHeaders() {
-        let headers: HeadersInit;
+        let headers: HeadersAll;
         if (this.config == null) {
             headers = {};
             this.config = { headers };
@@ -358,17 +360,22 @@ export abstract class ApiBase<R> implements IApi<R> {
      * Get content type
      * @param headers Headers
      */
-    getHeaderValue(headers: HeadersInit, key: string): string | null {
+    getHeaderValue(headers: HeadersAll, key: string): string | null {
+        // Key to lower case
+        key = key.toLowerCase();
+
         // String array
-        if (Array.isArray(headers)) {
-            const index = headers.findIndex((item) => {
-                const itemKey = item[0];
-                if (itemKey && itemKey.toLowerCase() === key.toLowerCase())
-                    return true;
-                return false;
-            });
-            if (index === -1) return null;
-            return headers[index][1];
+        // isIterable(headers) = true, Array.isArray(headers) also true
+        // so Array.from(headers) will never happen
+        if (isIterable(headers) || Array.isArray(headers)) {
+            const array = Array.isArray(headers)
+                ? headers
+                : Array.from(headers);
+            const arrayItem = array.find(
+                (item) => item[0].toLowerCase() === key
+            );
+            if (arrayItem == null) return null;
+            return arrayItem[1];
         }
 
         // Standard Headers
@@ -378,7 +385,7 @@ export abstract class ApiBase<R> implements IApi<R> {
 
         // Simple object
         const matchKey = Object.keys(headers).find(
-            (item) => item.toLowerCase() === key.toLowerCase()
+            (item) => item.toLowerCase() === key
         );
         if (matchKey) return headers[matchKey];
 
@@ -392,7 +399,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      */
     setContentLanguage(
         language: string | null | undefined,
-        headers?: HeadersInit
+        headers?: HeadersAll
     ) {
         this.setHeaderValue('Content-Language', language, headers);
     }
@@ -404,7 +411,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      */
     protected setContentType(
         contentType: string | null | undefined,
-        headers?: HeadersInit
+        headers?: HeadersAll
     ): void {
         let value = contentType;
         if (value && !value.includes('charset=')) {
@@ -423,25 +430,31 @@ export abstract class ApiBase<R> implements IApi<R> {
     setHeaderValue(
         key: string,
         value: string | null | undefined,
-        headers?: HeadersInit
+        headers?: HeadersAll
     ): void {
         // Default headers
         if (headers == null) headers = this.getHeaders();
 
-        // String array
-        if (Array.isArray(headers)) {
-            const index = headers.findIndex((item) => {
-                const itemKey = item[0];
-                if (itemKey && itemKey.toLowerCase() === key.toLowerCase())
-                    return true;
-                return false;
-            });
+        // Key to lower case
+        key = key.toLowerCase();
+
+        // isIterable(headers) = true, Array.isArray(headers) also true
+        // so Array.from(headers) will never happen
+        // so push and splice without updating the source array will be effective
+        if (isIterable(headers) || Array.isArray(headers)) {
+            const array = Array.isArray(headers)
+                ? headers
+                : Array.from(headers);
+
+            const index = array.findIndex(
+                (item) => item[0].toLowerCase() === key
+            );
 
             if (value) {
-                if (index === -1) headers.push([key, value]);
-                else headers[index][1] = value;
+                if (index === -1) array.push([key, value]);
+                else array[index][1] = value;
             } else if (index !== -1) {
-                headers.splice(index, 1);
+                array.splice(index, 1);
             }
 
             return;
@@ -456,9 +469,8 @@ export abstract class ApiBase<R> implements IApi<R> {
 
         // Simple object
         const matchKey =
-            Object.keys(headers).find(
-                (item) => item.toLowerCase() === key.toLowerCase()
-            ) || key;
+            Object.keys(headers).find((item) => item.toLowerCase() === key) ||
+            key;
         if (value) headers[matchKey] = value;
         else delete headers[matchKey];
     }
@@ -475,7 +487,7 @@ export abstract class ApiBase<R> implements IApi<R> {
     protected abstract createResponse(
         method: ApiMethod,
         url: string,
-        headers: HeadersInit,
+        headers: HeadersAll,
         data: any,
         responseType: ApiResponseType | undefined,
         rest: { [key: string]: any }

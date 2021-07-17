@@ -1,7 +1,7 @@
 import axios, { Method, AxiosResponse, ResponseType } from 'axios';
 import { DataTypes, DateUtils, DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
-import { ApiMethod, ApiResponseType, IApiResponse } from './IApi';
+import { ApiMethod, ApiResponseType, HeadersAll, IApiResponse } from './IApi';
 
 /**
  * Axios API
@@ -39,7 +39,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
     protected createResponse(
         method: ApiMethod,
         url: string,
-        headers: HeadersInit,
+        headers: HeadersAll,
         data: any,
         responseType: ApiResponseType | undefined,
         rest: { [key: string]: any }
