@@ -29,8 +29,8 @@ $ yarn add @etsoo/restclient
 - Under node, node-fetch (https://github.com/node-fetch/node-fetch) and formdata-node (https://github.com/octet-stream/form-data) will be applied.
 
 ```ts
-import { createClient, IApi } from '@etsoo/restclient';
-const client: IApi = createClient();
+import { createClient } from '@etsoo/restclient';
+const client = createClient();
 ```
 
 - Depending on your decision.
@@ -38,6 +38,9 @@ const client: IApi = createClient();
 ```ts
 import { FetchApi } from '@etsoo/restclient';
 const client = new FetchApi();
+// Or (Node)
+import { FetchNodeApi } from '@etsoo/restclient';
+const client = new FetchNodeApi();
 // Or
 import { AxiosApi } from '@etsoo/restclient';
 const client = new AxiosApi();

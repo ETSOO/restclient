@@ -1,6 +1,6 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.0.43",
+    "version": "1.0.44",
     "description": "TypeScript REST client supports Axios and Fetch",
     "main": "lib/mjs/index.js",
     "module": "lib/cjs/index.js",
