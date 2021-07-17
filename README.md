@@ -4,6 +4,7 @@
 
 - axios: https://github.com/axios/axios, based on XHR: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 - fetch: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+- node-fetch & formdata-node: https://github.com/node-fetch/node-fetch, https://github.com/octet-stream/form-data
 
 ESLint + AirbnbBase + Prettier, Jest(ts-jest) applied, supports CommonJs and ESM. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
 
@@ -26,7 +27,7 @@ $ yarn add @etsoo/restclient
 ### Initialization
 
 - Depending on the envioronment, fetch first. If fetch is not supported, use axios.
-- Under node, node-fetch (https://github.com/node-fetch/node-fetch) and formdata-node (https://github.com/octet-stream/form-data) will be applied.
+- Under node, node-fetch will be applied.
 
 ```ts
 import { createClient } from '@etsoo/restclient';
@@ -38,9 +39,11 @@ const client = createClient();
 ```ts
 import { FetchApi } from '@etsoo/restclient';
 const client = new FetchApi();
+
 // Or (Node)
 import { FetchNodeApi } from '@etsoo/restclient';
 const client = new FetchNodeApi();
+
 // Or
 import { AxiosApi } from '@etsoo/restclient';
 const client = new AxiosApi();

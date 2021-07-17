@@ -1,5 +1,6 @@
 import { DataTypes } from '@etsoo/shared';
 import { ApiDataError } from './ApiDataError';
+import { FormData as NodeFormData } from 'formdata-node';
 
 /**
  * API verbs
@@ -89,6 +90,7 @@ export type ApiRequestData =
     | File
     | FileList
     | FormData
+    | NodeFormData
     | Object
     | ReadableStream
     | DataTypes.SimpleObject
