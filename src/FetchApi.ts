@@ -8,10 +8,22 @@ import {
     isIterable
 } from './IApi';
 
+interface IFetch<R extends Response> {
+    (input: RequestInfo, init?: RequestInit): Promise<R>;
+}
+
 /**
- * Fetch API
+ * Fetch like API
  */
-export class FetchApi extends ApiBase<Response> {
+export class FetchLikeApi<R extends Response> extends ApiBase<R> {
+    readonly #fetch;
+
+    // Construct
+    constructor(fetch: IFetch<R>) {
+        super();
+        this.#fetch = fetch;
+    }
+
     /**
      * Create response
      * @param method Method
@@ -28,7 +40,7 @@ export class FetchApi extends ApiBase<Response> {
         data: any,
         _responseType: ApiResponseType | undefined,
         rest: { [key: string]: any }
-    ): Promise<Response> {
+    ): Promise<R> {
         // Headers
         const h = new Headers(
             isIterable(headers) ? Object.fromEntries(headers) : headers
@@ -41,7 +53,7 @@ export class FetchApi extends ApiBase<Response> {
             headers: h,
             method: ApiMethod[method]
         };
-        return fetch(url, requestBody);
+        return this.#fetch(url, requestBody);
     }
 
     /**
@@ -52,7 +64,7 @@ export class FetchApi extends ApiBase<Response> {
     getJson<T = DataTypes.ReadonlyData>(url: string) {
         return new Promise<T>((resolve, reject) => {
             // Fetch
-            fetch(url).then((response) => {
+            this.#fetch(url).then((response) => {
                 // Check validation
                 if (!response.ok) {
                     reject('Invalid Status');
@@ -79,7 +91,7 @@ export class FetchApi extends ApiBase<Response> {
      * @param reponseType Response data type
      */
     protected responseData(
-        response: Response,
+        response: R,
         responseType?: ApiResponseType
     ): Promise<any> {
         // 204 = No content
@@ -138,7 +150,7 @@ export class FetchApi extends ApiBase<Response> {
      * Transform original response to unified object
      * @param response Original response
      */
-    transformResponse(response: Response): IApiResponse {
+    transformResponse(response: R): IApiResponse {
         // https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
         const { headers, ok, status, statusText } = response;
         return {
@@ -147,5 +159,14 @@ export class FetchApi extends ApiBase<Response> {
             status,
             statusText
         };
+    }
+}
+
+/**
+ * Fetch API
+ */
+export class FetchApi extends FetchLikeApi<Response> {
+    constructor() {
+        super(fetch);
     }
 }

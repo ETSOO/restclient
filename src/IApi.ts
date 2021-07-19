@@ -1,6 +1,5 @@
-import { DataTypes } from '@etsoo/shared';
+import { DataTypes, IFormData } from '@etsoo/shared';
 import { ApiDataError } from './ApiDataError';
-import { FormData as NodeFormData } from 'formdata-node';
 
 /**
  * API verbs
@@ -89,13 +88,25 @@ export type ApiRequestData =
     | Blob
     | File
     | FileList
-    | FormData
-    | NodeFormData
+    | IFormData
     | Object
     | ReadableStream
     | DataTypes.SimpleObject
     | String
     | URLSearchParams;
+
+/**
+ * Is IFormData
+ * @param input Input object
+ * @returns result
+ */
+export function isFormData(input: ApiRequestData): input is IFormData {
+    const formData = input as any;
+    return (
+        typeof formData.getAll === 'function' &&
+        typeof formData.keys === 'function'
+    );
+}
 
 /**
  * API Response data type

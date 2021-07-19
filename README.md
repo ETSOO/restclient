@@ -4,9 +4,30 @@
 
 - axios: https://github.com/axios/axios, based on XHR: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 - fetch: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-- node-fetch & formdata-node: https://github.com/node-fetch/node-fetch, https://github.com/octet-stream/form-data
 
 ESLint + AirbnbBase + Prettier, Jest(ts-jest) applied, supports CommonJs and ESM. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
+
+Includes FetchLikeApi for extension quickly:
+```ts
+/**
+ * Fetch API
+ */
+export class FetchApi extends FetchLikeApi<Response> {
+    constructor() {
+        super(fetch);
+    }
+}
+
+// Under Node
+// install node-fetch (https://github.com/node-fetch/node-fetch) first, and @types/node-fetch with TypeScript
+const { FetchLikeApi } = require("@etsoo/restclient");
+const fetch, { Response } = require("node-fetch");
+class FetchApi extends FetchLikeApi<Response> {
+  constructor() {
+    super(fetch);
+  }
+}
+```
 
 ## Installing
 
@@ -26,8 +47,8 @@ $ yarn add @etsoo/restclient
 
 ### Initialization
 
-- Depending on the envioronment, fetch first. If fetch is not supported, use axios.
-- Under node, node-fetch will be applied.
+- Depending on the envioronment, fetch first, then use axios.
+- Under node, supports node-fetch.
 
 ```ts
 import { createClient } from '@etsoo/restclient';
@@ -39,10 +60,6 @@ const client = createClient();
 ```ts
 import { FetchApi } from '@etsoo/restclient';
 const client = new FetchApi();
-
-// Or (Node)
-import { FetchNodeApi } from '@etsoo/restclient';
-const client = new FetchNodeApi();
 
 // Or
 import { AxiosApi } from '@etsoo/restclient';

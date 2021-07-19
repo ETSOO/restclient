@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import { DomUtils, DataTypes } from '@etsoo/shared';
-import { FormData as NodeFormData } from 'formdata-node';
 import {
     IApi,
     ApiMethod,
@@ -19,7 +18,8 @@ import {
     IApiCompleteHandler,
     IPData,
     HeadersAll,
-    isIterable
+    isIterable,
+    isFormData
 } from './IApi';
 import { ApiError } from './ApiError';
 import { ApiDataError } from './ApiDataError';
@@ -220,11 +220,7 @@ export abstract class ApiBase<R> implements IApi<R> {
                     }
 
                     // Form data
-                    if (
-                        (typeof FormData !== 'undefined' &&
-                            data instanceof FormData) ||
-                        data instanceof NodeFormData
-                    ) {
+                    if (isFormData(data)) {
                         return [data];
                     }
 
