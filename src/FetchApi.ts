@@ -16,12 +16,12 @@ interface IFetch<R extends Response> {
  * Fetch like API
  */
 export class FetchLikeApi<R extends Response> extends ApiBase<R> {
-    readonly #fetch;
+    private readonly localFetch;
 
     // Construct
-    constructor(fetch: IFetch<R>) {
+    constructor(localFetch: IFetch<R>) {
         super();
-        this.#fetch = fetch;
+        this.localFetch = localFetch;
     }
 
     /**
@@ -53,7 +53,7 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
             headers: h,
             method: ApiMethod[method]
         };
-        return this.#fetch(url, requestBody);
+        return this.localFetch(url, requestBody);
     }
 
     /**
@@ -61,28 +61,20 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
      * @param url URL
      * @returns Json data
      */
-    getJson<T = DataTypes.ReadonlyData>(url: string) {
-        return new Promise<T>((resolve, reject) => {
-            // Fetch
-            this.#fetch(url).then((response) => {
-                // Check validation
-                if (!response.ok) {
-                    reject('Invalid Status');
-                    return;
-                }
+    async getJson<T extends DataTypes.ReadonlyData = DataTypes.ReadonlyData>(
+        url: string
+    ) {
+        // Fetch
+        const response = await this.localFetch(url);
 
-                // Json
-                response.json().then((json) => {
-                    if (json == null) {
-                        reject('No Data');
-                        return;
-                    }
+        // Check validation
+        if (response.ok) {
+            // Json
+            const json = await response.json();
 
-                    // Resolve
-                    resolve(json as T);
-                });
-            });
-        });
+            // Type
+            return json as T;
+        }
     }
 
     /**
@@ -167,6 +159,7 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
  */
 export class FetchApi extends FetchLikeApi<Response> {
     constructor() {
-        super(fetch);
+        // bind window is necessary to maintaim the this point from fetch calls
+        super(fetch.bind(window));
     }
 }

@@ -418,7 +418,9 @@ export interface IApi<R = any> {
      * @param url URL
      * @returns Json data
      */
-    getJson<T = DataTypes.ReadonlyData>(url: string): Promise<T>;
+    getJson<T extends DataTypes.ReadonlyData = DataTypes.ReadonlyData>(
+        url: string
+    ): Promise<T | undefined>;
 
     /**
      * Head API

@@ -67,31 +67,23 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
      * @param url URL
      * @returns Json data
      */
-    getJson<T = DataTypes.ReadonlyData>(url: string) {
-        return new Promise<T>((resolve, reject) => {
-            // Get
-            axios.get(url).then((response) => {
-                // Check validation
-                if (response.status != 200) {
-                    reject('Invalid Status');
-                    return;
-                }
+    async getJson<T extends DataTypes.ReadonlyData = DataTypes.ReadonlyData>(
+        url: string
+    ) {
+        const response = await axios.get(url);
+        if (
+            response.status === 200 &&
+            response.data != null &&
+            response.data !== ''
+        ) {
+            // Convert possible string to Json object
+            const data =
+                typeof response.data === 'string'
+                    ? JSON.parse(response.data)
+                    : response.data;
 
-                // No data
-                if (response.data == null || response.data === '') {
-                    reject('No Data');
-                }
-
-                // Convert possible string to Json object
-                const data =
-                    typeof response.data === 'string'
-                        ? JSON.parse(response.data)
-                        : response.data;
-
-                // Resolve
-                resolve(data as T);
-            });
-        });
+            return data as T;
+        }
     }
 
     /**

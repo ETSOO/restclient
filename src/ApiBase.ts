@@ -124,18 +124,22 @@ export abstract class ApiBase<R> implements IApi<R> {
 
         // Any success result
         let data: Readonly<DataTypes.DynamicData> | undefined;
-        if (typeof Promise.any === 'function') {
-            data = await Promise.any(endpoints.map((p) => this.getJson(p)));
-        } else {
-            data = await new Promise<Readonly<DataTypes.DynamicData>>(
-                (resolve) => {
-                    endpoints.forEach((p) => {
-                        this.getJson(p).then((result) => {
-                            resolve(result);
+
+        try {
+            if (typeof Promise.any === 'function') {
+                data = await Promise.any(endpoints.map((p) => this.getJson(p)));
+            } else {
+                data = await new Promise<Readonly<DataTypes.DynamicData>>(
+                    (resolve) => {
+                        endpoints.forEach(async (p) => {
+                            const result = await this.getJson(p);
+                            if (result != null) resolve(result);
                         });
-                    });
-                }
-            );
+                    }
+                );
+            }
+        } catch (e) {
+            data = undefined;
         }
 
         if (data == null) return undefined;
@@ -176,7 +180,9 @@ export abstract class ApiBase<R> implements IApi<R> {
      * Get Json data directly
      * @param url URL
      */
-    abstract getJson<T = DataTypes.ReadonlyData>(url: string): Promise<T>;
+    abstract getJson<T extends DataTypes.ReadonlyData = DataTypes.ReadonlyData>(
+        url: string
+    ): Promise<T | undefined>;
 
     /**
      * Format posted data
