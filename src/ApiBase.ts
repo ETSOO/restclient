@@ -261,7 +261,9 @@ export abstract class ApiBase<R> implements IApi<R> {
                     // Other cases
                     return [data];
                 } catch (ex) {
-                    return [undefined, ex];
+                    const error =
+                        ex instanceof Error ? ex : new Error(String(ex));
+                    return [undefined, error];
                 }
             }
 
@@ -776,9 +778,13 @@ export abstract class ApiBase<R> implements IApi<R> {
 
                 // Transform data type
                 return rawResult as T;
-            } catch (exception) {
+            } catch (ex) {
+                // unknow type of ex more safe
+                // https://devblogs.microsoft.com/typescript/announcing-typescript-4-4/
+                const error = ex instanceof Error ? ex : new Error(String(ex));
+
                 apiData.depth = 3;
-                this.handleError(exception, apiData, response, onError);
+                this.handleError(error, apiData, response, onError);
             }
         }
 

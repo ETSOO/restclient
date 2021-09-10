@@ -291,7 +291,7 @@ describe('GET tests', () => {
         expect(okResult?.length).toBe(2);
     });
 
-    it('Failure result', async (done) => {
+    it('Failure result', async () => {
         // Mock the response data
         fetchMock.mockResponse('{ title: "Not Found" }', {
             status: 404
@@ -305,7 +305,6 @@ describe('GET tests', () => {
                 onError: (error) => {
                     expect(error).toHaveProperty('message', 'Not Found');
                     expect(error.data).toHaveProperty('method', ApiMethod.POST);
-                    done();
                 }
             }
         );

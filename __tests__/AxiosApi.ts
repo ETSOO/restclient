@@ -201,6 +201,7 @@ describe('Protected methods tests', () => {
     });
 });
 
+// done only for async call with sync callback
 describe('GET tests', () => {
     it('OK result', async () => {
         // Act
@@ -211,7 +212,7 @@ describe('GET tests', () => {
         expect(okResult?.length).toBe(2);
     });
 
-    it('Failure result', async (done) => {
+    it('Failure result', async () => {
         // Act
         const failResult = await api.post<CountryItem[]>(
             '/Customer/CountryList',
@@ -224,7 +225,6 @@ describe('GET tests', () => {
                         'Method Not Allowed'
                     );
                     expect(error.data).toHaveProperty('method', ApiMethod.POST);
-                    done();
                 }
             }
         );
