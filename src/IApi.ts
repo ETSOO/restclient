@@ -46,22 +46,22 @@ export interface IPData {
     /**
      * IP address
      */
-    ip: string;
+    readonly ip: string;
 
     /**
      * Country name, like New Zealand
      */
-    country: string;
+    readonly country: string;
 
     /**
      * Country code, like NZ
      */
-    countryCode: string;
+    readonly countryCode: string;
 
     /**
      * Timezone, like Pacific/Auckland
      */
-    timezone?: string;
+    readonly timezone?: string;
 }
 
 /**
@@ -71,7 +71,7 @@ export interface IApiConfig {
     /**
      * Dynamic data
      */
-    [key: string]: any;
+    [key: string]: unknown;
 
     /**
      * Headers
@@ -96,19 +96,6 @@ export type ApiRequestData =
     | URLSearchParams;
 
 /**
- * Is IFormData
- * @param input Input object
- * @returns result
- */
-export function isFormData(input: ApiRequestData): input is IFormData {
-    const formData = input as any;
-    return (
-        typeof formData.getAll === 'function' &&
-        typeof formData.keys === 'function'
-    );
-}
-
-/**
  * API Response data type
  * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType
  */
@@ -128,7 +115,7 @@ export interface IApiData {
     /**
      * Data submitted
      */
-    data: any;
+    data: unknown;
 
     /**
      * Depth for debug
@@ -169,7 +156,7 @@ export interface IApiData {
 /**
  * API error handler
  */
-export interface IApiErrorHandler<R = any> {
+export interface IApiErrorHandler<R = unknown> {
     (error: ApiDataError<R>): boolean | undefined | void;
 }
 
@@ -192,8 +179,13 @@ export interface IResponseErrorData {
  * Is error data
  * @param data Raw data
  */
-export function isResponseErrorData(data: any): data is IResponseErrorData {
-    return data && (data.title || data.message);
+export function isResponseErrorData(data: unknown): data is IResponseErrorData {
+    return (
+        typeof data === 'object' &&
+        data != null &&
+        'title' in data &&
+        'message' in data
+    );
 }
 
 /**
@@ -256,7 +248,7 @@ export type ApiParams = DataTypes.SimpleObject | URLSearchParams;
  * API data parser
  */
 export interface IApiParser<T> {
-    (data: any): ApiResult<T>;
+    (data: unknown): ApiResult<T>;
 }
 
 /**
@@ -418,9 +410,7 @@ export interface IApi<R = any> {
      * @param url URL
      * @returns Json data
      */
-    getJson<T extends DataTypes.ReadonlyData = DataTypes.ReadonlyData>(
-        url: string
-    ): Promise<T | undefined>;
+    getJson<T extends {} = {}>(url: string): Promise<T | undefined>;
 
     /**
      * Head API

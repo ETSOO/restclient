@@ -97,9 +97,8 @@ jest.mock('axios');
 // https://github.com/axios/axios/search?q=AxiosInstance&unscoped_q=AxiosInstance
 // Strong type will use (config: AxiosRequestConfig): AxiosPromise;
 // While without it will use overloaded function (url: string, config?: AxiosRequestConfig): AxiosPromise
-const mockedAxios = mocked<{ (config: AxiosRequestConfig): AxiosPromise }>(
-    axios
-);
+const mockedAxios =
+    mocked<{ (config: AxiosRequestConfig): AxiosPromise }>(axios);
 
 const setupData = [
     { id: 'CN', name: 'China', creation: '1949-10-1' },
@@ -119,7 +118,7 @@ mockedAxios.mockImplementation((config) => {
     const initData = !!data;
     if (!initData) {
         if (getVerb) data = setupData;
-        else data = { title: 'Method Not Allowed' };
+        else data = {};
     }
 
     const response: AxiosResponse =
@@ -141,7 +140,7 @@ mockedAxios.mockImplementation((config) => {
                   },
                   config: localConfig,
                   status: 405,
-                  statusText: ''
+                  statusText: 'Method Not Allowed'
               };
 
     return Promise.resolve(response);

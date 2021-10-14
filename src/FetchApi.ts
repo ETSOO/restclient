@@ -1,4 +1,4 @@
-import { DataTypes, DateUtils, DomUtils } from '@etsoo/shared';
+import { DateUtils, DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
 import {
     ApiMethod,
@@ -61,9 +61,7 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
      * @param url URL
      * @returns Json data
      */
-    async getJson<T extends DataTypes.ReadonlyData = DataTypes.ReadonlyData>(
-        url: string
-    ) {
+    async getJson<T extends {} = {}>(url: string) {
         // Fetch
         const response = await this.localFetch(url);
 

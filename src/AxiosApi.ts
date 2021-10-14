@@ -1,5 +1,5 @@
 import axios, { Method, AxiosResponse, ResponseType } from 'axios';
-import { DataTypes, DateUtils, DomUtils } from '@etsoo/shared';
+import { DateUtils, DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, HeadersAll, IApiResponse } from './IApi';
 
@@ -67,9 +67,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
      * @param url URL
      * @returns Json data
      */
-    async getJson<T extends DataTypes.ReadonlyData = DataTypes.ReadonlyData>(
-        url: string
-    ) {
+    async getJson<T extends {} = {}>(url: string) {
         const response = await axios.get(url);
         if (
             response.status === 200 &&

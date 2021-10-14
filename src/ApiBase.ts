@@ -18,8 +18,7 @@ import {
     IApiCompleteHandler,
     IPData,
     HeadersAll,
-    isIterable,
-    isFormData
+    isIterable
 } from './IApi';
 import { ApiError } from './ApiError';
 import { ApiDataError } from './ApiDataError';
@@ -123,13 +122,13 @@ export abstract class ApiBase<R> implements IApi<R> {
         ];
 
         // Any success result
-        let data: Readonly<DataTypes.DynamicData> | undefined;
+        let data: Readonly<DataTypes.StringDictionary> | undefined;
 
         try {
             if (typeof Promise.any === 'function') {
                 data = await Promise.any(endpoints.map((p) => this.getJson(p)));
             } else {
-                data = await new Promise<Readonly<DataTypes.DynamicData>>(
+                data = await new Promise<Readonly<DataTypes.StringDictionary>>(
                     (resolve) => {
                         endpoints.forEach(async (p) => {
                             const result = await this.getJson(p);
@@ -180,9 +179,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      * Get Json data directly
      * @param url URL
      */
-    abstract getJson<T extends DataTypes.ReadonlyData = DataTypes.ReadonlyData>(
-        url: string
-    ): Promise<T | undefined>;
+    abstract getJson<T extends {} = {}>(url: string): Promise<T | undefined>;
 
     /**
      * Format posted data
@@ -226,7 +223,7 @@ export abstract class ApiBase<R> implements IApi<R> {
                     }
 
                     // Form data
-                    if (isFormData(data)) {
+                    if (DomUtils.isFormData(data)) {
                         return [data];
                     }
 
@@ -310,7 +307,10 @@ export abstract class ApiBase<R> implements IApi<R> {
                 // config value
                 const configValue = apiConfig[key];
 
-                if (typeof defaultValue === 'object') {
+                if (
+                    typeof defaultValue === 'object' &&
+                    typeof configValue === 'object'
+                ) {
                     // Is object, copy and merge
                     apiConfig[key] = {
                         ...defaultValue,
@@ -522,9 +522,7 @@ export abstract class ApiBase<R> implements IApi<R> {
     }
 
     // Response promise handler for error catch
-    private responsePromiseHandler(
-        promise: Promise<R>
-    ): Promise<{
+    private responsePromiseHandler(promise: Promise<R>): Promise<{
         /**
          * Response
          */
@@ -538,9 +536,8 @@ export abstract class ApiBase<R> implements IApi<R> {
         return promise
             .then(async (response) => {
                 // Destruct
-                const { ok, status, statusText } = this.transformResponse(
-                    response
-                );
+                const { ok, status, statusText } =
+                    this.transformResponse(response);
 
                 if (ok) {
                     return { response };
