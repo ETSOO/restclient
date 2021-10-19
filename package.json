@@ -1,6 +1,6 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.0.55",
+    "version": "1.0.56",
     "description": "TypeScript REST client supports Axios and Fetch",
     "main": "lib/cjs/index.js",
     "module": "lib/mjs/index.js",
@@ -41,7 +41,12 @@
         "API",
         "axios",
         "fetch",
-        "TypeScript"
+        "TypeScript",
+        "ETSOO",
+        "SmartERP",
+        "司友云平台",
+        "青岛亿速思维",
+        "上海亿商"
     ],
     "author": "Garry Xiao",
     "license": "MIT",
@@ -50,7 +55,7 @@
     },
     "homepage": "https://github.com/ETSOO/restclient#readme",
     "dependencies": {
-        "@etsoo/shared": "^1.0.52",
+        "@etsoo/shared": "^1.0.54",
         "axios": "^0.23.0"
     },
     "devDependencies": {
