@@ -88,10 +88,14 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
      * Get response data
      * @param response API response
      * @param reponseType Response data type
+     * @param dateFields Date field names
+     * @param defaultValue Default value
      */
     protected responseData(
         response: AxiosResponse,
-        responseType?: ApiResponseType
+        responseType?: ApiResponseType,
+        dateFields?: string[],
+        defaultValue?: unknown
     ): Promise<any> {
         const { data } = response;
         if (data) {
@@ -110,7 +114,10 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
                     return Promise.resolve('');
 
                 // Convert string to JSON object, rare
-                return Promise.resolve(JSON.parse(data, DateUtils.jsonParser));
+                const fields = this.getDateFields(dateFields, defaultValue);
+                if (fields.length > 0)
+                    return JSON.parse(data, DateUtils.jsonParser(fields));
+                return JSON.parse(data);
             }
         }
         return Promise.resolve(data);

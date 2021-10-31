@@ -271,6 +271,11 @@ export interface IApiPayload<T, R> {
     readonly config?: IApiConfig;
 
     /**
+     * Date field names
+     */
+    readonly dateFields?: string[];
+
+    /**
      * Default value
      */
     readonly defaultValue?: T;

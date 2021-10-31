@@ -79,10 +79,14 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
      * Get response data
      * @param response API response
      * @param reponseType Response data type
+     * @param dateFields Date field names
+     * @param defaultValue Default value
      */
     protected responseData(
         response: R,
-        responseType?: ApiResponseType
+        responseType?: ApiResponseType,
+        dateFields?: string[],
+        defaultValue?: unknown
     ): Promise<any> {
         // 204 = No content
         if (response.status === 204) return Promise.resolve('');
@@ -129,7 +133,10 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
         ) {
             return text.then((value) => {
                 if (value == null || value === '') return '';
-                return JSON.parse(value, DateUtils.jsonParser);
+                const fields = this.getDateFields(dateFields, defaultValue);
+                if (fields.length > 0)
+                    return JSON.parse(value, DateUtils.jsonParser(fields));
+                return JSON.parse(value);
             });
         }
 

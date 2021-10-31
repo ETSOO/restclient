@@ -502,14 +502,41 @@ export abstract class ApiBase<R> implements IApi<R> {
         rest: { [key: string]: any }
     ): Promise<R>;
 
+    protected getDateFields(dateFields?: string[], defaultValue?: unknown) {
+        // Set static date fields
+        if (dateFields != null && dateFields.length > 0) return dateFields;
+
+        // Dynamic from default value
+        const fields: string[] = [];
+        if (defaultValue != null) {
+            let simpleObject;
+            if (Array.isArray(defaultValue)) {
+                if (defaultValue.length === 0) return [];
+                simpleObject = defaultValue[0];
+            } else {
+                simpleObject = defaultValue;
+            }
+
+            for (const [key, value] of Object.entries(simpleObject)) {
+                if (value instanceof Date) fields.push(key);
+            }
+        }
+
+        return fields;
+    }
+
     /**
      * Get response data
      * @param response API response
      * @param reponseType Response data type
+     * @param dateFields Date field names
+     * @param defaultValue Default value
      */
     protected abstract responseData(
         response: R,
-        responseType?: ApiResponseType
+        responseType?: ApiResponseType,
+        dateFields?: string[],
+        defaultValue?: unknown
     ): Promise<any>;
 
     /**
@@ -654,6 +681,7 @@ export abstract class ApiBase<R> implements IApi<R> {
         const {
             contentType,
             config = {},
+            dateFields,
             defaultValue,
             onError,
             params,
@@ -747,7 +775,9 @@ export abstract class ApiBase<R> implements IApi<R> {
             try {
                 const rawResult = await this.responseData(
                     response,
-                    responseType
+                    responseType,
+                    dateFields,
+                    defaultValue
                 );
 
                 // May return null or ''

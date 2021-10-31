@@ -73,7 +73,7 @@ class AxiosApiHelper extends AxiosApi {
         response: AxiosResponse,
         responseType: ApiResponseType
     ): Promise<any> {
-        return super.responseData(response, responseType);
+        return super.responseData(response, responseType, ['creation']);
     }
 }
 

@@ -107,7 +107,7 @@ class FetchApiHelper extends FetchApi {
         response: Response,
         responseType: ApiResponseType
     ): Promise<any> {
-        return super.responseData(response, responseType);
+        return super.responseData(response, responseType, ['creation']);
     }
 }
 
@@ -386,6 +386,7 @@ describe('POST tests', () => {
         // Payload
         const payload: IApiPayload<CountryItem[], any> = {
             params: { id: 2, name: 'test' },
+            dateFields: ['creation'],
             config
         };
 
