@@ -494,7 +494,7 @@ export interface IApi<R = any> {
     /**
      * Set content language
      * @param language Content language
-     * @param headers Headers
+     * @param headers Headers, default is global headers
      */
     setContentLanguage(
         language: string | null | undefined,
@@ -510,7 +510,7 @@ export interface IApi<R = any> {
     setHeaderValue(
         key: string,
         value: string | null | undefined,
-        headers?: HeadersAll
+        headers: HeadersAll
     ): void;
 
     /**

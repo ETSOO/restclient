@@ -402,13 +402,17 @@ export abstract class ApiBase<R> implements IApi<R> {
     /**
      * Set content language
      * @param language Content language
-     * @param headers Headers
+     * @param headers Headers, default is global headers
      */
     setContentLanguage(
         language: string | null | undefined,
-        headers: HeadersAll
+        headers?: HeadersAll
     ) {
-        this.setHeaderValue('Content-Language', language, headers);
+        this.setHeaderValue(
+            'Content-Language',
+            language,
+            headers ?? this.getHeaders()
+        );
     }
 
     /**

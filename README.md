@@ -205,7 +205,7 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
     /**
      * Set content language
      * @param language Content language
-     * @param headers Headers
+     * @param headers Headers, default is global headers
      */
     setContentLanguage(
         language: string | null | undefined,
@@ -216,12 +216,12 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
      * Set header value
      * @param key Header name
      * @param value Header value
-     * @param headers Optional headers to lookup
+     * @param headers Headers to lookup
      */
     setHeaderValue(
         key: string,
         value: string | null | undefined,
-        headers?: HeadersInit
+        headers: HeadersInit
     ): void;
 
     /**
