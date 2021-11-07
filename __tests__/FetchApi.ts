@@ -40,7 +40,7 @@ class FetchApiHelper extends FetchApi {
      */
     setContentType(
         contentType: string | null | undefined,
-        headers?: HeadersInit
+        headers: HeadersInit
     ): void {
         super.setContentType(contentType, headers);
     }
@@ -377,17 +377,15 @@ describe('POST tests', () => {
             headers: { 'Content-Type': 'application/json; charset=utf-8' }
         });
 
-        // Act
-        const config = { headers: {} };
-
         // Local authorization
-        api.authorize(ApiAuthorizationScheme.Basic, 'basic', config.headers);
+        localApi.authorize(ApiAuthorizationScheme.Basic, 'basic');
+
+        const configBefore = JSON.stringify(localApi.config);
 
         // Payload
         const payload: IApiPayload<CountryItem[], any> = {
             params: { id: 2, name: 'test' },
-            dateFields: ['creation'],
-            config
+            dateFields: ['creation']
         };
 
         const okResult = await localApi.post<CountryItem[]>(
@@ -396,7 +394,10 @@ describe('POST tests', () => {
             payload
         );
 
+        const configAfter = JSON.stringify(localApi.config);
+
         // Assert
+        expect(configBefore).toStrictEqual(configAfter);
         expect(payload.response).not.toBeNull();
         expect(okResult).toBeDefined();
 

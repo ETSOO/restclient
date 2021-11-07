@@ -197,14 +197,15 @@ export abstract class ApiBase<R> implements IApi<R> {
         contentType?: string
     ): [any, Error?] {
         if (data) {
-            // Calculate content type
-            let localContentType = contentType || this.getContentType(headers);
-
             if (
                 method === ApiMethod.PATCH ||
                 method === ApiMethod.POST ||
                 method === ApiMethod.PUT
             ) {
+                // Calculate content type
+                let localContentType =
+                    contentType || this.getContentType(headers);
+
                 // Body type
                 try {
                     // String type
@@ -307,14 +308,11 @@ export abstract class ApiBase<R> implements IApi<R> {
                 // config value
                 const configValue = apiConfig[key];
 
-                if (
-                    typeof defaultValue === 'object' &&
-                    typeof configValue === 'object'
-                ) {
+                if (typeof defaultValue === 'object') {
                     // Is object, copy and merge
                     apiConfig[key] = {
                         ...defaultValue,
-                        ...(configValue ?? {})
+                        ...(typeof configValue === 'object' ? configValue : {})
                     };
                 } else if (!Object.keys(apiConfig).some((k) => k === key)) {
                     apiConfig[key] = defaultValue;
@@ -408,7 +406,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      */
     setContentLanguage(
         language: string | null | undefined,
-        headers?: HeadersAll
+        headers: HeadersAll
     ) {
         this.setHeaderValue('Content-Language', language, headers);
     }
@@ -420,7 +418,7 @@ export abstract class ApiBase<R> implements IApi<R> {
      */
     protected setContentType(
         contentType: string | null | undefined,
-        headers?: HeadersAll
+        headers: HeadersAll
     ): void {
         let value = contentType;
         if (value && !value.includes('charset=')) {
@@ -439,11 +437,8 @@ export abstract class ApiBase<R> implements IApi<R> {
     setHeaderValue(
         key: string,
         value: string | null | undefined,
-        headers?: HeadersAll
+        headers: HeadersAll
     ): void {
-        // Default headers
-        if (headers == null) headers = this.getHeaders();
-
         // Key to lower case
         key = key.toLowerCase();
 
