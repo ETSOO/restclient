@@ -118,7 +118,7 @@ export abstract class ApiBase<R> implements IApi<R> {
         const endpoints = [
             'https://extreme-ip-lookup.com/json/',
             'https://geoip-db.com/json/',
-            'http://ip-api.com/json'
+            'https://ipapi.co/json'
         ];
 
         // Any success result
