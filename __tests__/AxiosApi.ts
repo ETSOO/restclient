@@ -1,5 +1,3 @@
-import { enableFetchMocks } from 'jest-fetch-mock';
-import { mocked } from 'ts-jest/utils';
 import axios, { AxiosResponse, AxiosRequestConfig, AxiosPromise } from 'axios';
 import { AxiosApi } from '../src/AxiosApi';
 import { ApiMethod, ApiResponseType, ApiRequestData } from '../src/IApi';
@@ -86,27 +84,20 @@ interface CountryItem {
     creation: Date;
 }
 
-// Enable fetch mocks to avoid Headers/fetch is not defined
-// https://www.npmjs.com/package/jest-fetch-mock
-enableFetchMocks();
-
 // This is needed to allow jest to modify axios at runtime
-jest.mock('axios');
-
-// Mocking axios function
-// https://github.com/axios/axios/search?q=AxiosInstance&unscoped_q=AxiosInstance
-// Strong type will use (config: AxiosRequestConfig): AxiosPromise;
-// While without it will use overloaded function (url: string, config?: AxiosRequestConfig): AxiosPromise
-const mockedAxios =
-    mocked<{ (config: AxiosRequestConfig): AxiosPromise }>(axios);
-
 const setupData = [
     { id: 'CN', name: 'China', creation: '1949-10-1' },
     { id: 'NZ', name: 'New Zealand', creation: '1907-9-26' }
 ];
 
-// Mocking implementation
-mockedAxios.mockImplementation((config) => {
+jest.mock('axios');
+
+// axios as unknown to avoid properties mismatch.
+const mockedAxios = axios as unknown as jest.MockedFunction<{
+    (config: AxiosRequestConfig): AxiosPromise;
+}>;
+
+mockedAxios.mockImplementation((config: AxiosRequestConfig) => {
     const localConfig = config || ({} as AxiosRequestConfig);
 
     const getVerb =
@@ -250,3 +241,6 @@ describe('POST tests', () => {
         }
     });
 });
+function AxiosInstance(AxiosInstance: any) {
+    throw new Error('Function not implemented.');
+}
