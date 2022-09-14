@@ -165,6 +165,6 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
 export class FetchApi extends FetchLikeApi<Response> {
     constructor() {
         // bind window is necessary to maintaim the this point from fetch calls
-        super(fetch.bind(window));
+        super(fetch.bind(globalThis));
     }
 }
