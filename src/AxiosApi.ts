@@ -1,4 +1,10 @@
-import axios, { Method, AxiosResponse, ResponseType } from 'axios';
+import axios, {
+    Method,
+    AxiosResponse,
+    ResponseType,
+    RawAxiosResponseHeaders,
+    AxiosResponseHeaders
+} from 'axios';
 import { DateUtils, DomUtils } from '@etsoo/shared';
 import { ApiBase } from './ApiBase';
 import { ApiMethod, ApiResponseType, HeadersAll, IApiResponse } from './IApi';
@@ -84,6 +90,17 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
         }
     }
 
+    private transformHeaders(
+        headers: RawAxiosResponseHeaders | AxiosResponseHeaders
+    ): HeadersAll {
+        if (typeof headers.toJSON === 'function') {
+            return headers.toJSON(true) as {};
+        } else if (typeof headers === 'object') {
+            return headers as {};
+        }
+        return {};
+    }
+
     /**
      * Get response data
      * @param response API response
@@ -101,7 +118,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
         if (data) {
             // Content type
             const [contentType] = this.getContentTypeAndCharset(
-                response.headers
+                this.transformHeaders(response.headers)
             );
 
             if (
@@ -133,7 +150,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
         // HTTP status codes range from 200-299
         const ok = status >= 200 && status <= 299;
         return {
-            headers,
+            headers: this.transformHeaders(headers),
             ok,
             status,
             statusText

@@ -117,7 +117,7 @@ mockedAxios.mockImplementation((config: AxiosRequestConfig) => {
             ? {
                   data,
                   headers: {
-                      ...localConfig.headers,
+                      //..localConfig.headers,
                       ...{ 'Content-type': 'application/json' }
                   },
                   config: localConfig,

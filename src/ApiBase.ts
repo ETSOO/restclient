@@ -26,7 +26,7 @@ import { ApiDataError } from './ApiDataError';
 /**
  * Api abstract class
  */
-export abstract class ApiBase<R> implements IApi<R> {
+export abstract class ApiBase<R = any> implements IApi<R> {
     /**
      * Headers content type key
      */

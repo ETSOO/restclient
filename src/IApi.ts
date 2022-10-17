@@ -254,7 +254,7 @@ export interface IApiParser<T> {
 /**
  * API payload interface
  */
-export interface IApiPayload<T, R> {
+export interface IApiPayload<T, R = any> {
     /**
      * Content type
      */
