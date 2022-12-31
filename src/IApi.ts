@@ -1,4 +1,4 @@
-import { DataTypes, IFormData } from '@etsoo/shared';
+import { ContentDisposition, DataTypes, IFormData } from '@etsoo/shared';
 import { ApiDataError } from './ApiDataError';
 
 /**
@@ -379,6 +379,14 @@ export interface IApi<R = any> {
      * @param headers Headers
      */
     getContentTypeAndCharset(headers: HeadersAll): [string, string?];
+
+    /**
+     * Get HTTP content dispostion
+     * @param responseOrValue Response or header value
+     * @returns Result
+     */
+    getContentDisposition(response: R): ContentDisposition | undefined;
+    getContentDisposition(header: string): ContentDisposition | undefined;
 
     /**
      * Get content type

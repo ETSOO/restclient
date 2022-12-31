@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { DomUtils, DataTypes } from '@etsoo/shared';
+import { DomUtils, DataTypes, ContentDisposition } from '@etsoo/shared';
 import {
     IApi,
     ApiMethod,
@@ -361,6 +361,24 @@ export abstract class ApiBase<R = any> implements IApi<R> {
             this.config.headers = headers;
         }
         return headers;
+    }
+
+    getContentDisposition(response: R): ContentDisposition | undefined;
+    getContentDisposition(header: string): ContentDisposition | undefined;
+    /**
+     * Get HTTP content dispostion
+     * @param responseOrValue Response or header value
+     * @returns Result
+     */
+    getContentDisposition(responseOrValue: R | string) {
+        const cd =
+            typeof responseOrValue === 'string'
+                ? responseOrValue
+                : this.getHeaderValue(
+                      this.transformResponse(responseOrValue).headers,
+                      'Content-Disposition'
+                  );
+        return ContentDisposition.parse(cd);
     }
 
     /**

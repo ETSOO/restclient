@@ -170,6 +170,14 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
     detectIP(): Promise<IPData | undefined>;
 
     /**
+     * Get HTTP content dispostion
+     * @param responseOrValue Response or header value
+     * @returns Result
+     */
+    getContentDisposition(response: R): ContentDisposition | undefined;
+    getContentDisposition(header: string): ContentDisposition | undefined;
+
+    /**
      * Get content type and charset
      * @param headers Headers
      */
