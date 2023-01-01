@@ -94,6 +94,20 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
         // Content type
         const [contentType] = this.getContentTypeAndCharset(response.headers);
 
+        // Is JSON, common case
+        if (
+            responseType === ApiResponseType.Json ||
+            DomUtils.isJSONContentType(contentType)
+        ) {
+            const fields = this.getDateFields(dateFields, defaultValue);
+            if (fields.length === 0) return response.json();
+
+            return response.text().then((value) => {
+                if (value == null || value === '') return '';
+                return JSON.parse(value, DateUtils.jsonParser(fields));
+            });
+        }
+
         if (
             responseType === ApiResponseType.Blob ||
             contentType.startsWith('application/octet-stream')
@@ -104,20 +118,18 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
             return response.arrayBuffer();
 
         if (responseType === ApiResponseType.Document) {
-            return new Promise((resolve) => {
-                response.text().then((value) => {
-                    // Document type
-                    const type = contentType
-                        ? (contentType as DOMParserSupportedType)
-                        : 'application/xml';
+            return response.text().then((value) => {
+                // Document type
+                const type = contentType
+                    ? (contentType as DOMParserSupportedType)
+                    : 'application/xml';
 
-                    // Transform text to document object (DOM)
-                    // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser
-                    const result = new DOMParser().parseFromString(value, type);
+                // Transform text to document object (DOM)
+                // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser
+                const result = new DOMParser().parseFromString(value, type);
 
-                    // Promise resolve
-                    resolve(result);
-                });
+                // Promise resolve
+                return result;
             });
         }
 
@@ -125,22 +137,7 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
             return Promise.resolve(response.body);
 
         // Default is text
-        const text = response.text();
-
-        if (
-            responseType === ApiResponseType.Json ||
-            DomUtils.isJSONContentType(contentType)
-        ) {
-            return text.then((value) => {
-                if (value == null || value === '') return '';
-                const fields = this.getDateFields(dateFields, defaultValue);
-                if (fields.length > 0)
-                    return JSON.parse(value, DateUtils.jsonParser(fields));
-                return JSON.parse(value);
-            });
-        }
-
-        return text;
+        return response.text();
     }
 
     /**
