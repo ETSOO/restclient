@@ -186,6 +186,7 @@ describe('Protected methods tests', () => {
         expect(api.getContentTypeAndCharset(headers)[0]).toBe(
             'application/json'
         );
+        expect(api.getContentLength(headers)).toBeUndefined();
         expect(typeof data).toBe('string');
         expect(data).toMatch('"id":');
     });

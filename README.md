@@ -178,6 +178,13 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
     getContentDisposition(header: string): ContentDisposition | undefined;
 
     /**
+     * Get content length
+     * @param headers Headers
+     * @returns
+     */
+    getContentLength(headers: HeadersAll): number | undefined;
+
+    /**
      * Get content type and charset
      * @param headers Headers
      */

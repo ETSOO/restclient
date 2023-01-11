@@ -330,6 +330,17 @@ export abstract class ApiBase<R = any> implements IApi<R> {
     }
 
     /**
+     * Get content length
+     * @param headers Headers
+     * @returns
+     */
+    getContentLength(headers: HeadersAll): number | undefined {
+        const cl = this.getHeaderValue(headers, 'content-length');
+        if (cl == null || cl === '') return undefined;
+        return parseInt(cl);
+    }
+
+    /**
      * Get content type and charset
      * @param headers Headers
      */

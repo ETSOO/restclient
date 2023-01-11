@@ -375,18 +375,25 @@ export interface IApi<R = any> {
     detectIP(): Promise<IPData | undefined>;
 
     /**
-     * Get content type and charset
-     * @param headers Headers
-     */
-    getContentTypeAndCharset(headers: HeadersAll): [string, string?];
-
-    /**
      * Get HTTP content dispostion
      * @param responseOrValue Response or header value
      * @returns Result
      */
     getContentDisposition(response: R): ContentDisposition | undefined;
     getContentDisposition(header: string): ContentDisposition | undefined;
+
+    /**
+     * Get content length
+     * @param headers Headers
+     * @returns
+     */
+    getContentLength(headers: HeadersAll): number | undefined;
+
+    /**
+     * Get content type and charset
+     * @param headers Headers
+     */
+    getContentTypeAndCharset(headers: HeadersAll): [string, string?];
 
     /**
      * Get content type

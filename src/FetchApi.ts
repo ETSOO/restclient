@@ -89,7 +89,11 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
         defaultValue?: unknown
     ): Promise<any> {
         // 204 = No content
-        if (response.status === 204) return Promise.resolve('');
+        if (
+            response.status === 204 ||
+            this.getContentLength(response.headers) === 0
+        )
+            return Promise.resolve('');
 
         // Content type
         const [contentType] = this.getContentTypeAndCharset(response.headers);

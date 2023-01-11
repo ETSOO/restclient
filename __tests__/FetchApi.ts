@@ -178,7 +178,7 @@ describe('Protected methods tests', () => {
     });
 
     test('Tests for formatData', () => {
-        const headers = {};
+        const headers = { 'content-length': '123' };
         const [data] = api.formatData(
             ApiMethod.PUT,
             headers,
@@ -188,6 +188,7 @@ describe('Protected methods tests', () => {
         expect(api.getContentTypeAndCharset(headers)[0]).toBe(
             'application/json'
         );
+        expect(api.getContentLength(headers)).toBe(123);
         expect(typeof data).toBe('string');
         expect(data).toMatch('"id":');
     });

@@ -1,6 +1,6 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.0.82",
+    "version": "1.0.83",
     "description": "TypeScript REST client supports Axios and Fetch",
     "main": "lib/cjs/index.js",
     "module": "lib/mjs/index.js",
@@ -61,7 +61,7 @@
     },
     "devDependencies": {
         "@babel/cli": "^7.20.7",
-        "@babel/core": "^7.20.7",
+        "@babel/core": "^7.20.12",
         "@babel/plugin-transform-runtime": "^7.19.6",
         "@babel/preset-env": "^7.20.2",
         "@babel/runtime-corejs3": "^7.20.7",
