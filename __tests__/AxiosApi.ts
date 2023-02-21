@@ -1,4 +1,9 @@
-import axios, { AxiosResponse, AxiosRequestConfig, AxiosPromise } from 'axios';
+import axios, {
+    AxiosResponse,
+    AxiosRequestConfig,
+    AxiosPromise,
+    InternalAxiosRequestConfig
+} from 'axios';
 import { AxiosApi } from '../src/AxiosApi';
 import { ApiMethod, ApiResponseType, ApiRequestData } from '../src/IApi';
 import { ApiError } from '../src/ApiError';
@@ -98,14 +103,12 @@ const mockedAxios = axios as unknown as jest.MockedFunction<{
 }>;
 
 mockedAxios.mockImplementation((config: AxiosRequestConfig) => {
-    const localConfig = config || ({} as AxiosRequestConfig);
-
     const getVerb =
-        localConfig.method == null ||
-        localConfig.method === 'get' ||
-        localConfig.method === 'GET';
+        config.method == null ||
+        config.method === 'get' ||
+        config.method === 'GET';
 
-    let { data } = localConfig;
+    let { data } = config;
     const initData = !!data;
     if (!initData) {
         if (getVerb) data = setupData;
@@ -118,9 +121,9 @@ mockedAxios.mockImplementation((config: AxiosRequestConfig) => {
                   data,
                   headers: {
                       //..localConfig.headers,
-                      ...{ 'Content-type': 'application/json' }
+                      'Content-type': 'application/json'
                   },
-                  config: localConfig,
+                  config: config as InternalAxiosRequestConfig,
                   status: 200,
                   statusText: 'OK'
               }
@@ -129,7 +132,7 @@ mockedAxios.mockImplementation((config: AxiosRequestConfig) => {
                   headers: {
                       'Content-Type': 'application/problem+json; charset=utf-8'
                   },
-                  config: localConfig,
+                  config: config as InternalAxiosRequestConfig,
                   status: 405,
                   statusText: 'Method Not Allowed'
               };
