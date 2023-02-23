@@ -306,7 +306,7 @@ export interface IApiPayload<T, R = any> {
     readonly showLoading?: boolean;
 
     /**
-     * Local API and ignore baseUrl
+     * Local URL and ignore baseUrl
      */
     readonly local?: boolean;
 }

@@ -261,6 +261,7 @@ When you call any API, pass additional properties with the payload parameter.
 |response|Request response object|
 |responseType|Specify response data type|
 |showLoading|Whether to show loading bar|
+|local|Local URL and ignore baseUrl|
 
 ## License
 
