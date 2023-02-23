@@ -304,6 +304,11 @@ export interface IApiPayload<T, R = any> {
      * Show loading indicator
      */
     readonly showLoading?: boolean;
+
+    /**
+     * Local API and ignore baseUrl
+     */
+    readonly local?: boolean;
 }
 
 /**

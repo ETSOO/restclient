@@ -715,7 +715,8 @@ export abstract class ApiBase<R = any> implements IApi<R> {
             params,
             parser,
             responseType = this.defaultResponseType,
-            showLoading
+            showLoading,
+            local
         } = payload || {};
 
         // Reset last error
@@ -770,7 +771,7 @@ export abstract class ApiBase<R = any> implements IApi<R> {
         if (this.onRequest) this.onRequest(apiData);
 
         // Calculate the URL
-        const api = this.buildUrl(localUrl);
+        const api = local ? localUrl : this.buildUrl(localUrl);
 
         // Act and the response
         const { response, error } = await this.responsePromiseHandler(
