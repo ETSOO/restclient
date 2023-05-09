@@ -53,6 +53,10 @@ $ yarn add @etsoo/restclient
 ```ts
 import { createClient } from '@etsoo/restclient';
 const client = createClient();
+
+// Or
+import { createClientAsync } from '@etsoo/restclient';
+const client = await createClientAsync();
 ```
 
 - Depending on your decision.
