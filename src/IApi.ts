@@ -261,7 +261,7 @@ export interface IApiPayload<T, R = any> {
     readonly contentType?: string;
 
     /**
-     * Error handler
+     * Error handler, return false will prevent global handling
      */
     readonly onError?: IApiErrorHandler<R>;
 
