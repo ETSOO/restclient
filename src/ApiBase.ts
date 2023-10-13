@@ -30,12 +30,7 @@ export abstract class ApiBase<R = any> implements IApi<R> {
     /**
      * Headers content type key
      */
-    static ContentTypeKey = 'Content-Type';
-
-    /**
-     * JSON content type
-     */
-    static JsonContentType = 'application/json';
+    protected static ContentTypeKey = 'Content-Type';
 
     /**
      * API base url
@@ -64,6 +59,13 @@ export abstract class ApiBase<R = any> implements IApi<R> {
      */
     get lastError() {
         return this.lastErrorPrivate;
+    }
+
+    /**
+     * JSON content type
+     */
+    get jsonContentType() {
+        return 'application/json';
     }
 
     /**
@@ -218,7 +220,7 @@ export abstract class ApiBase<R = any> implements IApi<R> {
                         if (data.startsWith('{') && data.endsWith('}')) {
                             // Guess as JSON
                             if (!localContentType)
-                                localContentType = ApiBase.JsonContentType;
+                                localContentType = this.jsonContentType;
                         } else if (data.startsWith('<') && data.endsWith('>')) {
                             // Guess as XML
                             if (!localContentType)
@@ -241,7 +243,7 @@ export abstract class ApiBase<R = any> implements IApi<R> {
                     ) {
                         // Object type, default to JSON
                         if (!localContentType)
-                            localContentType = ApiBase.JsonContentType;
+                            localContentType = this.jsonContentType;
                         this.setContentType(localContentType, headers);
 
                         return [JSON.stringify(data)];

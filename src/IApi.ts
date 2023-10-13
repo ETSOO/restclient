@@ -336,6 +336,11 @@ export interface IApi<R = any> {
     defaultResponseType?: ApiResponseType;
 
     /**
+     * JSON content type
+     */
+    readonly jsonContentType: string;
+
+    /**
      * Last error
      */
     lastError?: ApiDataError<R>;

@@ -121,7 +121,7 @@ mockedAxios.mockImplementation((config: AxiosRequestConfig) => {
                   data,
                   headers: {
                       //..localConfig.headers,
-                      'Content-type': 'application/json'
+                      'Content-type': api.jsonContentType
                   },
                   config: config as InternalAxiosRequestConfig,
                   status: 200,
@@ -187,7 +187,7 @@ describe('Protected methods tests', () => {
             { id: 1, name: 'test' }
         );
         expect(api.getContentTypeAndCharset(headers)[0]).toBe(
-            'application/json'
+            api.jsonContentType
         );
         expect(api.getContentLength(headers)).toBeUndefined();
         expect(typeof data).toBe('string');

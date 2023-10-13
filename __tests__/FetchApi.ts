@@ -187,7 +187,7 @@ describe('Protected methods tests', () => {
             { id: 1, name: 'test' }
         );
         expect(api.getContentTypeAndCharset(headers)[0]).toBe(
-            ApiBase.JsonContentType
+            api.jsonContentType
         );
         expect(api.getContentLength(headers)).toBe(123);
         expect(typeof data).toBe('string');
@@ -198,7 +198,7 @@ describe('Protected methods tests', () => {
     test('Tests for array formatData', () => {
         const headers = {
             'content-length': '123',
-            'content-type': ApiBase.JsonContentType
+            'content-type': api.jsonContentType
         };
         const [data] = api.formatData(
             ApiMethod.POST,
@@ -208,7 +208,7 @@ describe('Protected methods tests', () => {
         );
 
         expect(api.getContentTypeAndCharset(headers)[0]).toBe(
-            ApiBase.JsonContentType
+            api.jsonContentType
         );
         expect(api.getContentLength(headers)).toBe(123);
         expect(data).toMatch('["a","b","c"]');
@@ -253,7 +253,7 @@ describe('setContentType/getContentType/getContentTypeAndCharset tests', () => {
     // Names are case insensitive
     test('name case insensitive', () => {
         // Act
-        api.setContentType(ApiBase.JsonContentType, headers);
+        api.setContentType(api.jsonContentType, headers);
 
         // Assert
         expect(Object.keys(headers).length).toBe(2);
@@ -267,7 +267,7 @@ describe('setContentType/getContentType/getContentTypeAndCharset tests', () => {
         // Act
         const result = api.getContentTypeAndCharset(headers);
         expect(result).toStrictEqual([
-            ApiBase.JsonContentType,
+            api.jsonContentType,
             `charset=${api.charset}`
         ]);
     });
@@ -277,7 +277,7 @@ describe('GET tests', () => {
     test('Empty result', async () => {
         // Mock the response data
         fetchMock.mockResponse('', {
-            headers: { 'Content-type': ApiBase.JsonContentType }
+            headers: { 'Content-type': api.jsonContentType }
         });
 
         // Act
@@ -302,7 +302,7 @@ describe('GET tests', () => {
     test('OK result', async () => {
         // Mock the response data
         fetchMock.mockResponse(JSON.stringify(data), {
-            headers: { 'Content-type': ApiBase.JsonContentType }
+            headers: { 'Content-type': api.jsonContentType }
         });
 
         // Act
@@ -380,7 +380,7 @@ describe('POST tests', () => {
             );
 
             expect(api.getContentTypeAndCharset(apiData.headers)[0]).toBe(
-                'application/json'
+                api.jsonContentType
             );
             expect(apiData.method).toBe(ApiMethod.POST);
         };

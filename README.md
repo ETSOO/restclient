@@ -143,6 +143,7 @@ if(customer == null) {
 |charset|Charset for sending data, default is 'utf-8'|
 |config|See axios/Request Config or fetch/RequestInit|
 |defaultResponseType|Default type is JSON|
+|jsonContentType|JSON content type string, 'application/json'|
 |lastError|Last error for track|
 |onError|Error occured callback|
 |onRequest|Before request callback|
