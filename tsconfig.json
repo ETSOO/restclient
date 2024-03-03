@@ -3,7 +3,7 @@
         /* Visit https://aka.ms/tsconfig.json to read more about this file */
         "target": "ES2020",
         "module": "ESNext",
-        "moduleResolution": "Bundler",
+        "moduleResolution": "Node10",
         "isolatedModules": true,
         "lib": ["DOM", "DOM.Iterable", "ESNext"],
         "outDir": "./lib/mjs",
