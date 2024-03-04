@@ -5,10 +5,10 @@ import type { IApi } from './IApi';
  */
 export async function createClientAsync(): Promise<IApi> {
     if (typeof fetch === 'undefined') {
-        const { AxiosApi } = await import('./AxiosApi');
+        const { AxiosApi } = await import('./AxiosApi.js');
         return new AxiosApi();
     }
 
-    const { FetchApi } = await import('./FetchApi');
+    const { FetchApi } = await import('./FetchApi.js');
     return new FetchApi();
 }
