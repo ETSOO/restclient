@@ -336,6 +336,47 @@ describe('GET tests', () => {
         expect(api.lastError?.data.url).toBe('/Customer/CountryList');
     });
 
+    it('Failure result with .NET model validation', async () => {
+        // Mock the response data
+        const data = {
+            type: 'https://tools.ietf.org/html/rfc9110#section-15.5.1',
+            title: 'One or more validation errors occurred.',
+            status: 400,
+            errors: {
+                $: [
+                    'JSON deserialization for type \u0027com.etsoo.CMS.RQ.User.UserCreateRQ\u0027 was missing required properties, including the following: password'
+                ],
+                rq: ['The rq field is required.']
+            },
+            traceId: '00-ed96a4f0c83f066594ecc69b77da9803-df770e3cd714fedd-00'
+        };
+        fetchMock.mockResponse(JSON.stringify(data), {
+            status: 400,
+            headers: {
+                'Content-Type': 'application/problem+json; charset=utf-8'
+            }
+        });
+
+        // Act
+        const failResult = await api.post<CountryItem[]>(
+            '/Customer/CountryList',
+            undefined,
+            {
+                onError: (error) => {
+                    expect(error).toHaveProperty(
+                        'message',
+                        'One or more validation errors occurred.'
+                    );
+                    expect(error.data).toHaveProperty('method', ApiMethod.POST);
+                }
+            }
+        );
+
+        // Assert
+        expect(failResult).toBeUndefined();
+        expect(api.lastError?.data.url).toBe('/Customer/CountryList');
+    });
+
     it('detectIP tests', async () => {
         // Mock the response data
         fetchMock.mockResponse(

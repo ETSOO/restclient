@@ -183,8 +183,7 @@ export function isResponseErrorData(data: unknown): data is IResponseErrorData {
     return (
         typeof data === 'object' &&
         data != null &&
-        'title' in data &&
-        'message' in data
+        ('title' in data || 'message' in data)
     );
 }
 

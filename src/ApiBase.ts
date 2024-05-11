@@ -580,7 +580,7 @@ export abstract class ApiBase<R = any> implements IApi<R> {
      */
     private responseErrorMessage(data: any) {
         if (isResponseErrorData(data)) return data.message || data.title;
-        return data;
+        return undefined;
     }
 
     // Response promise handler for error catch
@@ -607,7 +607,7 @@ export abstract class ApiBase<R = any> implements IApi<R> {
 
                 // Other status codes are considered as error
                 // Try to read response JSON data
-                let errorMessage: string | null;
+                let errorMessage: string | undefined;
                 try {
                     // When parse, may have unexpected end of JSON input
                     const responseData = await this.responseData(
@@ -616,10 +616,10 @@ export abstract class ApiBase<R = any> implements IApi<R> {
                     );
                     errorMessage = this.responseErrorMessage(responseData);
                 } catch {
-                    errorMessage = null;
+                    errorMessage = undefined;
                 }
 
-                const message = statusText || errorMessage || 'Unkown';
+                const message = errorMessage || statusText || 'Unkown';
                 const error = new ApiError(message, status);
                 return { error, response };
             })
