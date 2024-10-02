@@ -340,6 +340,11 @@ export interface IApi<R = any> {
     readonly jsonContentType: string;
 
     /**
+     * Name of the API
+     */
+    name: string;
+
+    /**
      * Last error
      */
     lastError?: ApiDataError<R>;

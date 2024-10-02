@@ -138,6 +138,7 @@ const api = new FetchApiHelper();
 // Server side cross origin http://localhost should be added
 // "testEnvironment": "node"
 api.baseUrl = 'http://localhost:19333';
+api.name = 'Etsoo';
 
 // Arrange
 const data = [
@@ -215,8 +216,12 @@ describe('Protected methods tests', () => {
     });
 });
 
-describe('authorize tests', () => {
-    test('Global level', () => {
+describe('Global level tests', () => {
+    test('Name', () => {
+        // Assert
+        expect(api.name).toBe('Etsoo');
+    });
+    test('Authorization', () => {
         // Act
         api.authorize(ApiAuthorizationScheme.Bearer, 'abc');
 

@@ -145,6 +145,7 @@ if(customer == null) {
 |defaultResponseType|Default type is JSON|
 |jsonContentType|JSON content type string, 'application/json'|
 |lastError|Last error for track|
+|name|The name of the API, default value is 'system'|
 |onError|Error occured callback|
 |onRequest|Before request callback|
 |onComplete|After request completed but before onResponse|

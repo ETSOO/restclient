@@ -69,6 +69,11 @@ export abstract class ApiBase<R = any> implements IApi<R> {
     }
 
     /**
+     * Name of the API
+     */
+    name: string = 'system';
+
+    /**
      * API error handler
      */
     onError?: IApiErrorHandler<R>;
