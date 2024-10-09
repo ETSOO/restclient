@@ -754,12 +754,7 @@ export abstract class ApiBase<R = any> implements IApi<R> {
 
         // URL parameters
         const parameters = localParams.toString();
-        let localUrl = url;
-        if (parameters) {
-            if (localUrl.includes('?')) localUrl += '&';
-            else localUrl += '?';
-            localUrl += parameters;
-        }
+        const localUrl = parameters ? url.addUrlParams(parameters) : url;
 
         // API data
         const apiData: IApiData = {
