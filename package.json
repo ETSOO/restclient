@@ -1,6 +1,6 @@
 {
     "name": "@etsoo/restclient",
-    "version": "1.1.13",
+    "version": "1.1.14",
     "description": "TypeScript REST client supports Axios and Fetch",
     "main": "lib/cjs/index.js",
     "module": "lib/mjs/index.js",
@@ -56,7 +56,7 @@
     },
     "homepage": "https://github.com/ETSOO/restclient#readme",
     "dependencies": {
-        "@etsoo/shared": "^1.2.50",
+        "@etsoo/shared": "^1.2.51",
         "axios": "^1.7.7"
     },
     "devDependencies": {
