@@ -8,20 +8,22 @@
 ESLint + AirbnbBase + Prettier, Jest(ts-jest) applied, supports CommonJs and ESM. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
 
 Includes FetchLikeApi for extension quickly:
+
 ```ts
 /**
  * Fetch API
  */
 export class FetchApi extends FetchLikeApi<Response> {
-    constructor() {
-        super(fetch);
-    }
+  constructor() {
+    super(fetch);
+  }
 }
 
 // Under Node
 // install node-fetch (https://github.com/node-fetch/node-fetch) first, and @types/node-fetch with TypeScript
 const { FetchLikeApi } = require("@etsoo/restclient");
-const fetch, { Response } = require("node-fetch");
+const fetch,
+  { Response } = require("node-fetch");
 class FetchApi extends FetchLikeApi<Response> {
   constructor() {
     super(fetch);
@@ -51,22 +53,22 @@ $ yarn add @etsoo/restclient
 - Under node, supports node-fetch.
 
 ```ts
-import { createClient } from '@etsoo/restclient';
+import { createClient } from "@etsoo/restclient";
 const client = createClient();
 
 // Or
-import { createClientAsync } from '@etsoo/restclient';
+import { createClientAsync } from "@etsoo/restclient";
 const client = await createClientAsync();
 ```
 
 - Depending on your decision.
 
 ```ts
-import { FetchApi } from '@etsoo/restclient';
+import { FetchApi } from "@etsoo/restclient";
 const client = new FetchApi();
 
 // Or
-import { AxiosApi } from '@etsoo/restclient';
+import { AxiosApi } from "@etsoo/restclient";
 const client = new AxiosApi();
 ```
 
@@ -75,27 +77,26 @@ const client = new AxiosApi();
 ```ts
 // Customer data structure
 interface Customer {
-    id: string,
-    name: string
+  id: string;
+  name: string;
 }
 
 // API client
 const client = createClient();
 
 // Authorization, JWT
-client.authorize(ApiAuthorizationScheme.Bearer, '*** JWT token ***');
+client.authorize(ApiAuthorizationScheme.Bearer, "*** JWT token ***");
 
 // Read customer list with asyc/await ES6+ style
-const customers = await client.get<Customer[]>('/api/customer');
+const customers = await client.get<Customer[]>("/api/customer");
 // or with traditional callback way
-client.get<Customer[]>('/api/customer').then(customers => {
-});
+client.get<Customer[]>("/api/customer").then((customers) => {});
 
 // Read one customer
-const customer = await client.get<Customer>('/api/customer/1');
-if(customer == null) {
-    // Error found
-    return;
+const customer = await client.get<Customer>("/api/customer/1");
+if (customer == null) {
+  // Error found
+  return;
 }
 console.log(customer.name);
 ```
@@ -108,27 +109,31 @@ const client = createClient();
 
 // Global error handling
 client.onError = (error) => {
-    console.log(error);
-}
+  console.log(error);
+};
 
 // Read one customer
 var payload: IApiPayload<Customer, any> = {
-    // Current call's error handling
-    onError = (error) => {
-        console.log(error);
-        // return false to prevent further error handling
-        return false;
-    },
-    // Pass default value to distinguish return value with error or undefined
-    defaultValue: {}
-}
+  // Current call's error handling
+  onError = (error) => {
+    console.log(error);
+    // return false to prevent further error handling
+    return false;
+  },
+  // Pass default value to distinguish return value with error or undefined
+  defaultValue: {}
+};
 
-const customer = await client.get<Customer>('/api/customer/1', undefined, payload);
-if(customer == null) {
-    // Error found
-    // client.lastError cache the last error
-    // For accurate check, validate client.lastError.data.url
-    return;
+const customer = await client.get<Customer>(
+  "/api/customer/1",
+  undefined,
+  payload
+);
+if (customer == null) {
+  // Error found
+  // client.lastError cache the last error
+  // For accurate check, validate client.lastError.data.url
+  return;
 }
 
 // Now call payload.response to access headers
@@ -137,19 +142,19 @@ if(customer == null) {
 
 ## Properties
 
-|Name|Description|
-|---:|---|
-|baseUrl|API base URL, add to the API root of all calls|
-|charset|Charset for sending data, default is 'utf-8'|
-|config|See axios/Request Config or fetch/RequestInit|
-|defaultResponseType|Default type is JSON|
-|jsonContentType|JSON content type string, 'application/json'|
-|lastError|Last error for track|
-|name|The name of the API, default value is 'system'|
-|onError|Error occured callback|
-|onRequest|Before request callback|
-|onComplete|After request completed but before onResponse|
-|onResponse|After response callback|
+|                Name | Description                                    |
+| ------------------: | ---------------------------------------------- |
+|             baseUrl | API base URL, add to the API root of all calls |
+|             charset | Charset for sending data, default is 'utf-8'   |
+|              config | See axios/Request Config or fetch/RequestInit  |
+| defaultResponseType | Default type is JSON                           |
+|     jsonContentType | JSON content type string, 'application/json'   |
+|           lastError | Last error for track                           |
+|                name | The name of the API, default value is 'system' |
+|             onError | Error occured callback                         |
+|           onRequest | Before request callback                        |
+|          onComplete | After request completed but before onResponse  |
+|          onResponse | After response callback                        |
 
 ## Methods
 
@@ -256,18 +261,18 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
 
 When you call any API, pass additional properties with the payload parameter.
 
-|Name|Description|
-|---:|---|
-|contentType|Specify data type to send, like 'application/json'|
-|onError|Current API call error callback|
-|config|Current API config. See axios/Request Config or fetch/RequestInit|
-|defaultValue|Default value, like [] for array return to distinguish undefined or error return|
-|params|URL parameters|
-|parser|Current API response data parser|
-|response|Request response object|
-|responseType|Specify response data type|
-|showLoading|Whether to show loading bar|
-|local|Local URL and ignore baseUrl|
+|         Name | Description                                                                      |
+| -----------: | -------------------------------------------------------------------------------- |
+|  contentType | Specify data type to send, like 'application/json'                               |
+|      onError | Current API call error callback                                                  |
+|       config | Current API config. See axios/Request Config or fetch/RequestInit                |
+| defaultValue | Default value, like [] for array return to distinguish undefined or error return |
+|       params | URL parameters                                                                   |
+|       parser | Current API response data parser                                                 |
+|     response | Request response object                                                          |
+| responseType | Specify response data type                                                       |
+|  showLoading | Whether to show loading bar                                                      |
+|        local | Local URL and ignore baseUrl                                                     |
 
 ## License
 

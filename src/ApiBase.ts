@@ -1,992 +1,930 @@
 /* eslint-disable no-param-reassign */
-import { DomUtils, DataTypes, ContentDisposition } from '@etsoo/shared';
+import { DomUtils, DataTypes, ContentDisposition } from "@etsoo/shared";
 import {
-    IApi,
-    ApiMethod,
-    IApiPayload,
-    ApiRequestData,
-    IApiErrorHandler,
-    IApiRequestHandler,
-    IApiResponseHandler,
-    IApiConfig,
-    IApiData,
-    isResponseErrorData,
-    ApiParams,
-    ApiResponseType,
-    IApiResponse,
-    ApiAuthorizationScheme,
-    IApiCompleteHandler,
-    IPData,
-    HeadersAll,
-    isIterable
-} from './IApi';
-import { ApiError } from './ApiError';
-import { ApiDataError } from './ApiDataError';
+  IApi,
+  ApiMethod,
+  IApiPayload,
+  ApiRequestData,
+  IApiErrorHandler,
+  IApiRequestHandler,
+  IApiResponseHandler,
+  IApiConfig,
+  IApiData,
+  isResponseErrorData,
+  ApiParams,
+  ApiResponseType,
+  IApiResponse,
+  ApiAuthorizationScheme,
+  IApiCompleteHandler,
+  IPData,
+  HeadersAll,
+  isIterable
+} from "./IApi";
+import { ApiError } from "./ApiError";
+import { ApiDataError } from "./ApiDataError";
 
 /**
  * Api abstract class
  */
 export abstract class ApiBase<R = any> implements IApi<R> {
-    /**
-     * Headers content type key
-     */
-    protected static ContentTypeKey = 'Content-Type';
+  /**
+   * Headers content type key
+   */
+  protected static ContentTypeKey = "Content-Type";
 
-    /**
-     * API base url
-     */
-    baseUrl?: string;
+  /**
+   * API base url
+   */
+  baseUrl?: string;
 
-    /**
-     * Charset, default is 'utf-8'
-     */
-    charset: string = 'utf-8';
+  /**
+   * Charset, default is 'utf-8'
+   */
+  charset: string = "utf-8";
 
-    /**
-     * Default configures
-     */
-    config?: IApiConfig;
+  /**
+   * Default configures
+   */
+  config?: IApiConfig;
 
-    /**
-     * Default response data type
-     */
-    defaultResponseType?: ApiResponseType;
+  /**
+   * Default response data type
+   */
+  defaultResponseType?: ApiResponseType;
 
-    private lastErrorPrivate?: ApiDataError<R>;
+  private lastErrorPrivate?: ApiDataError<R>;
 
-    /**
-     * Last error
-     */
-    get lastError() {
-        return this.lastErrorPrivate;
+  /**
+   * Last error
+   */
+  get lastError() {
+    return this.lastErrorPrivate;
+  }
+
+  /**
+   * JSON content type
+   */
+  get jsonContentType() {
+    return "application/json";
+  }
+
+  /**
+   * Name of the API
+   */
+  name: string = "system";
+
+  /**
+   * API error handler
+   */
+  onError?: IApiErrorHandler<R>;
+
+  /**
+   * API request handler
+   */
+  onRequest?: IApiRequestHandler;
+
+  /**
+   * API complete handler
+   */
+  onComplete?: IApiCompleteHandler<R>;
+
+  /**
+   * API response handler
+   */
+  onResponse?: IApiResponseHandler<R>;
+
+  /**
+   * Authorize the call
+   * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
+   * @param scheme Scheme
+   * @param token Token, empty/null/undefined to remove it
+   * @param writeHeaders Headers to write authtication, default to all calls
+   */
+  authorize(
+    scheme: ApiAuthorizationScheme | string,
+    token: string | undefined,
+    writeHeaders?: HeadersAll
+  ): void {
+    // Scheme name
+    const schemeName =
+      typeof scheme === "number" ? ApiAuthorizationScheme[scheme] : scheme;
+
+    // Headers
+    const headers = writeHeaders ?? this.getHeaders();
+
+    // Authentication header value
+    const value = token ? `${schemeName} ${token}` : token;
+
+    // Set
+    this.setHeaderValue("Authorization", value, headers);
+  }
+
+  /**
+   * Detect IP data
+   * @returns IP data
+   */
+  async detectIP() {
+    // Endpoints for detection
+    const endpoints = [
+      "https://extreme-ip-lookup.com/json/",
+      "https://geoip-db.com/json/",
+      "https://ipapi.co/json"
+    ];
+
+    // Any success result
+    let data: Readonly<DataTypes.StringDictionary> | undefined;
+
+    try {
+      if (typeof Promise.any === "function") {
+        data = await Promise.any(endpoints.map((p) => this.getJson(p)));
+      } else {
+        data = await new Promise<Readonly<DataTypes.StringDictionary>>(
+          (resolve) => {
+            endpoints.forEach(async (p) => {
+              const result = await this.getJson(p);
+              if (result != null) resolve(result);
+            });
+          }
+        );
+      }
+    } catch (e) {
+      data = undefined;
     }
 
-    /**
-     * JSON content type
-     */
-    get jsonContentType() {
-        return 'application/json';
+    if (data == null) return undefined;
+
+    // IP data
+    const ipData: IPData = {
+      ip: data.query ?? data.IPv4 ?? data.IPv6,
+      country: data.country ?? data.country_name,
+      countryCode: data.countryCode ?? data.country_code,
+      timezone: data.timezone
+    };
+
+    // Return
+    return ipData;
+  }
+
+  /**
+   * Build API url
+   * @param url API url
+   */
+  protected buildUrl(url: string) {
+    return !url.includes("://") && this.baseUrl ? `${this.baseUrl}${url}` : url;
+  }
+
+  // Create form files
+  private createFormFiles(files: FileList) {
+    const formFiles = new FormData();
+    for (let i = 0; i < files.length; i += 1) {
+      const file = files.item(i);
+      if (file) formFiles.append("files", file);
     }
+    return formFiles;
+  }
 
-    /**
-     * Name of the API
-     */
-    name: string = 'system';
+  /**
+   * Get Json data directly
+   * @param url URL
+   */
+  abstract getJson<T extends {} = {}>(url: string): Promise<T | undefined>;
 
-    /**
-     * API error handler
-     */
-    onError?: IApiErrorHandler<R>;
+  /**
+   * Format posted data
+   * @param method Verb
+   * @param headers Headers
+   * @param params URL parameters
+   * @param data Raw data
+   * @param contentType Content type
+   */
+  protected formatData(
+    method: ApiMethod,
+    headers: HeadersAll,
+    params: URLSearchParams,
+    data?: ApiRequestData,
+    contentType?: string
+  ): [any, Error?] {
+    if (data) {
+      if (
+        method === ApiMethod.PATCH ||
+        method === ApiMethod.POST ||
+        method === ApiMethod.PUT
+      ) {
+        // Calculate content type
+        let localContentType = contentType || this.getContentType(headers);
 
-    /**
-     * API request handler
-     */
-    onRequest?: IApiRequestHandler;
-
-    /**
-     * API complete handler
-     */
-    onComplete?: IApiCompleteHandler<R>;
-
-    /**
-     * API response handler
-     */
-    onResponse?: IApiResponseHandler<R>;
-
-    /**
-     * Authorize the call
-     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
-     * @param scheme Scheme
-     * @param token Token, empty/null/undefined to remove it
-     * @param writeHeaders Headers to write authtication, default to all calls
-     */
-    authorize(
-        scheme: ApiAuthorizationScheme | string,
-        token: string | undefined,
-        writeHeaders?: HeadersAll
-    ): void {
-        // Scheme name
-        const schemeName =
-            typeof scheme === 'number'
-                ? ApiAuthorizationScheme[scheme]
-                : scheme;
-
-        // Headers
-        const headers = writeHeaders ?? this.getHeaders();
-
-        // Authentication header value
-        const value = token ? `${schemeName} ${token}` : token;
-
-        // Set
-        this.setHeaderValue('Authorization', value, headers);
-    }
-
-    /**
-     * Detect IP data
-     * @returns IP data
-     */
-    async detectIP() {
-        // Endpoints for detection
-        const endpoints = [
-            'https://extreme-ip-lookup.com/json/',
-            'https://geoip-db.com/json/',
-            'https://ipapi.co/json'
-        ];
-
-        // Any success result
-        let data: Readonly<DataTypes.StringDictionary> | undefined;
-
+        // Body type
         try {
-            if (typeof Promise.any === 'function') {
-                data = await Promise.any(endpoints.map((p) => this.getJson(p)));
-            } else {
-                data = await new Promise<Readonly<DataTypes.StringDictionary>>(
-                    (resolve) => {
-                        endpoints.forEach(async (p) => {
-                            const result = await this.getJson(p);
-                            if (result != null) resolve(result);
-                        });
-                    }
-                );
+          // String type
+          if (data instanceof String) {
+            if (data.startsWith("{") && data.endsWith("}")) {
+              // Guess as JSON
+              if (!localContentType) localContentType = this.jsonContentType;
+            } else if (data.startsWith("<") && data.endsWith(">")) {
+              // Guess as XML
+              if (!localContentType) localContentType = "application/xml";
             }
-        } catch (e) {
-            data = undefined;
+            this.setContentType(localContentType, headers);
+            return [data];
+          }
+
+          // Form data
+          if (DomUtils.isFormData(data)) {
+            return [data];
+          }
+
+          // JSON
+          if (
+            data.constructor === Object ||
+            (localContentType && DomUtils.isJSONContentType(localContentType))
+          ) {
+            // Object type, default to JSON
+            if (!localContentType) localContentType = this.jsonContentType;
+            this.setContentType(localContentType, headers);
+
+            return [JSON.stringify(data)];
+          }
+
+          // Set content type
+          if (!localContentType) this.setContentType(localContentType, headers);
+
+          // FileList, check availibility
+          if (typeof FileList !== "undefined" && data instanceof FileList)
+            return [this.createFormFiles(data)];
+
+          // ArrayBufferView
+          if (ArrayBuffer.isView(data)) return [data.buffer];
+
+          // Other cases
+          return [data];
+        } catch (ex) {
+          const error = ex instanceof Error ? ex : new Error(String(ex));
+          return [undefined, error];
+        }
+      }
+
+      // params shoud be avoided to pass with data
+      if (Array.from(params.keys()).length > 0) {
+        return [
+          undefined,
+          new Error("URL params shoud be avoided to pass with data")
+        ];
+      }
+
+      if (data instanceof URLSearchParams) {
+        data.forEach((value, key) => {
+          params.set(key, value);
+        });
+      } else if (DataTypes.isSimpleObject(data)) {
+        DomUtils.mergeURLSearchParams(params, data);
+      } else {
+        return [
+          undefined,
+          new TypeError("Data transforms to params with wrong data type")
+        ];
+      }
+    }
+
+    return [undefined, undefined];
+  }
+
+  /**
+   * Merge API configure, two levels only
+   * @param apiConfig API configure
+   */
+  protected mergeConfig(apiConfig: IApiConfig) {
+    if (this.config) {
+      Object.keys(this.config).forEach((key) => {
+        // default value
+        const defaultValue = this.config![key];
+        if (defaultValue == null) {
+          return;
         }
 
-        if (data == null) return undefined;
+        // config value
+        const configValue = apiConfig[key];
 
-        // IP data
-        const ipData: IPData = {
-            ip: data.query ?? data.IPv4 ?? data.IPv6,
-            country: data.country ?? data.country_name,
-            countryCode: data.countryCode ?? data.country_code,
-            timezone: data.timezone
-        };
-
-        // Return
-        return ipData;
-    }
-
-    /**
-     * Build API url
-     * @param url API url
-     */
-    protected buildUrl(url: string) {
-        return !url.includes('://') && this.baseUrl
-            ? `${this.baseUrl}${url}`
-            : url;
-    }
-
-    // Create form files
-    private createFormFiles(files: FileList) {
-        const formFiles = new FormData();
-        for (let i = 0; i < files.length; i += 1) {
-            const file = files.item(i);
-            if (file) formFiles.append('files', file);
+        if (typeof defaultValue === "object") {
+          // Is object, copy and merge
+          apiConfig[key] = {
+            ...defaultValue,
+            ...(typeof configValue === "object" ? configValue : {})
+          };
+        } else if (!Object.keys(apiConfig).some((k) => k === key)) {
+          apiConfig[key] = defaultValue;
         }
-        return formFiles;
+      });
+    }
+  }
+
+  /**
+   * Get content type
+   * @param headers Headers
+   */
+  protected getContentType(headers: HeadersAll): string | null {
+    return this.getHeaderValue(headers, ApiBase.ContentTypeKey);
+  }
+
+  /**
+   * Get content length
+   * @param headers Headers
+   * @returns
+   */
+  getContentLength(headers: HeadersAll): number | undefined {
+    const cl = this.getHeaderValue(headers, "content-length");
+    if (cl == null || cl === "") return undefined;
+    return parseInt(cl);
+  }
+
+  /**
+   * Get content type and charset
+   * @param headers Headers
+   */
+  getContentTypeAndCharset(headers: HeadersAll): [string, string?] {
+    const contentType = this.getContentType(headers);
+    if (contentType) {
+      const parts = contentType.split(";");
+      return [parts[0].trim(), parts.length > 1 ? parts[1].trim() : undefined];
+    }
+    return ["", undefined];
+  }
+
+  /**
+   * Get headers
+   * @returns Headers
+   */
+  protected getHeaders() {
+    let headers: HeadersAll;
+    if (this.config == null) {
+      headers = {};
+      this.config = { headers };
+    } else if (this.config.headers) {
+      headers = this.config.headers;
+    } else {
+      headers = {};
+      this.config.headers = headers;
+    }
+    return headers;
+  }
+
+  getContentDisposition(response: R): ContentDisposition | undefined;
+  getContentDisposition(header: string): ContentDisposition | undefined;
+  /**
+   * Get HTTP content dispostion
+   * @param responseOrValue Response or header value
+   * @returns Result
+   */
+  getContentDisposition(responseOrValue: R | string) {
+    const cd =
+      typeof responseOrValue === "string"
+        ? responseOrValue
+        : this.getHeaderValue(
+            this.transformResponse(responseOrValue).headers,
+            "Content-Disposition"
+          );
+    return ContentDisposition.parse(cd);
+  }
+
+  /**
+   * Get content type
+   * @param headers Headers
+   */
+  getHeaderValue(headers: HeadersAll, key: string): string | null {
+    // Key to lower case
+    key = key.toLowerCase();
+
+    // String array
+    // isIterable(headers) = true, Array.isArray(headers) also true
+    // so Array.from(headers) will never happen
+    if (isIterable(headers) || Array.isArray(headers)) {
+      const array = Array.isArray(headers) ? headers : Array.from(headers);
+      const arrayItem = array.find((item) => item[0].toLowerCase() === key);
+      if (arrayItem == null) return null;
+      return arrayItem[1];
     }
 
-    /**
-     * Get Json data directly
-     * @param url URL
-     */
-    abstract getJson<T extends {} = {}>(url: string): Promise<T | undefined>;
-
-    /**
-     * Format posted data
-     * @param method Verb
-     * @param headers Headers
-     * @param params URL parameters
-     * @param data Raw data
-     * @param contentType Content type
-     */
-    protected formatData(
-        method: ApiMethod,
-        headers: HeadersAll,
-        params: URLSearchParams,
-        data?: ApiRequestData,
-        contentType?: string
-    ): [any, Error?] {
-        if (data) {
-            if (
-                method === ApiMethod.PATCH ||
-                method === ApiMethod.POST ||
-                method === ApiMethod.PUT
-            ) {
-                // Calculate content type
-                let localContentType =
-                    contentType || this.getContentType(headers);
-
-                // Body type
-                try {
-                    // String type
-                    if (data instanceof String) {
-                        if (data.startsWith('{') && data.endsWith('}')) {
-                            // Guess as JSON
-                            if (!localContentType)
-                                localContentType = this.jsonContentType;
-                        } else if (data.startsWith('<') && data.endsWith('>')) {
-                            // Guess as XML
-                            if (!localContentType)
-                                localContentType = 'application/xml';
-                        }
-                        this.setContentType(localContentType, headers);
-                        return [data];
-                    }
-
-                    // Form data
-                    if (DomUtils.isFormData(data)) {
-                        return [data];
-                    }
-
-                    // JSON
-                    if (
-                        data.constructor === Object ||
-                        (localContentType &&
-                            DomUtils.isJSONContentType(localContentType))
-                    ) {
-                        // Object type, default to JSON
-                        if (!localContentType)
-                            localContentType = this.jsonContentType;
-                        this.setContentType(localContentType, headers);
-
-                        return [JSON.stringify(data)];
-                    }
-
-                    // Set content type
-                    if (!localContentType)
-                        this.setContentType(localContentType, headers);
-
-                    // FileList, check availibility
-                    if (
-                        typeof FileList !== 'undefined' &&
-                        data instanceof FileList
-                    )
-                        return [this.createFormFiles(data)];
-
-                    // ArrayBufferView
-                    if (ArrayBuffer.isView(data)) return [data.buffer];
-
-                    // Other cases
-                    return [data];
-                } catch (ex) {
-                    const error =
-                        ex instanceof Error ? ex : new Error(String(ex));
-                    return [undefined, error];
-                }
-            }
-
-            // params shoud be avoided to pass with data
-            if (Array.from(params.keys()).length > 0) {
-                return [
-                    undefined,
-                    new Error('URL params shoud be avoided to pass with data')
-                ];
-            }
-
-            if (data instanceof URLSearchParams) {
-                data.forEach((value, key) => {
-                    params.set(key, value);
-                });
-            } else if (DataTypes.isSimpleObject(data)) {
-                DomUtils.mergeURLSearchParams(params, data);
-            } else {
-                return [
-                    undefined,
-                    new TypeError(
-                        'Data transforms to params with wrong data type'
-                    )
-                ];
-            }
-        }
-
-        return [undefined, undefined];
+    // Standard Headers
+    if (headers instanceof Headers) {
+      return headers.get(key);
     }
 
-    /**
-     * Merge API configure, two levels only
-     * @param apiConfig API configure
-     */
-    protected mergeConfig(apiConfig: IApiConfig) {
-        if (this.config) {
-            Object.keys(this.config).forEach((key) => {
-                // default value
-                const defaultValue = this.config![key];
-                if (defaultValue == null) {
-                    return;
-                }
+    // Simple object
+    const matchKey = Object.keys(headers).find(
+      (item) => item.toLowerCase() === key
+    );
+    if (matchKey) return headers[matchKey];
 
-                // config value
-                const configValue = apiConfig[key];
+    return null;
+  }
 
-                if (typeof defaultValue === 'object') {
-                    // Is object, copy and merge
-                    apiConfig[key] = {
-                        ...defaultValue,
-                        ...(typeof configValue === 'object' ? configValue : {})
-                    };
-                } else if (!Object.keys(apiConfig).some((k) => k === key)) {
-                    apiConfig[key] = defaultValue;
-                }
-            });
-        }
+  /**
+   * Set content language
+   * @param language Content language
+   * @param headers Headers, default is global headers
+   */
+  setContentLanguage(
+    language: string | null | undefined,
+    headers?: HeadersAll
+  ) {
+    this.setHeaderValue(
+      "Content-Language",
+      language,
+      headers ?? this.getHeaders()
+    );
+  }
+
+  /**
+   * Set content type
+   * @param contentType New content type
+   * @param headers Headers
+   */
+  protected setContentType(
+    contentType: string | null | undefined,
+    headers: HeadersAll
+  ): void {
+    let value = contentType;
+    if (value && !value.includes("charset=")) {
+      // Test charset
+      value += `; charset=${this.charset}`;
+    }
+    this.setHeaderValue(ApiBase.ContentTypeKey, value, headers);
+  }
+
+  /**
+   * Set header value
+   * @param key Header name
+   * @param value Header value
+   * @param headers Optional headers to lookup
+   */
+  setHeaderValue(
+    key: string,
+    value: string | null | undefined,
+    headers: HeadersAll
+  ): void {
+    // Key to lower case
+    key = key.toLowerCase();
+
+    // isIterable(headers) = true, Array.isArray(headers) also true
+    // so Array.from(headers) will never happen
+    // so push and splice without updating the source array will be effective
+    if (isIterable(headers) || Array.isArray(headers)) {
+      const array = Array.isArray(headers) ? headers : Array.from(headers);
+
+      const index = array.findIndex((item) => item[0].toLowerCase() === key);
+
+      if (value) {
+        if (index === -1) array.push([key, value]);
+        else array[index][1] = value;
+      } else if (index !== -1) {
+        array.splice(index, 1);
+      }
+
+      return;
     }
 
-    /**
-     * Get content type
-     * @param headers Headers
-     */
-    protected getContentType(headers: HeadersAll): string | null {
-        return this.getHeaderValue(headers, ApiBase.ContentTypeKey);
+    // Standard Headers
+    if (headers instanceof Headers) {
+      if (value) headers.set(key, value);
+      else headers.delete(key);
+      return;
     }
 
-    /**
-     * Get content length
-     * @param headers Headers
-     * @returns
-     */
-    getContentLength(headers: HeadersAll): number | undefined {
-        const cl = this.getHeaderValue(headers, 'content-length');
-        if (cl == null || cl === '') return undefined;
-        return parseInt(cl);
+    // Simple object
+    const matchKey =
+      Object.keys(headers).find((item) => item.toLowerCase() === key) || key;
+    if (value) headers[matchKey] = value;
+    else delete headers[matchKey];
+  }
+
+  /**
+   * Create response
+   * @param method Method
+   * @param url Api URL
+   * @param headers Headers
+   * @param data Data
+   * @param reponseType Response data type
+   * @param rest Rest properties
+   */
+  protected abstract createResponse(
+    method: ApiMethod,
+    url: string,
+    headers: HeadersAll,
+    data: any,
+    responseType: ApiResponseType | undefined,
+    rest: { [key: string]: any }
+  ): Promise<R>;
+
+  protected getDateFields(dateFields?: string[], defaultValue?: unknown) {
+    // Set static date fields
+    if (dateFields != null && dateFields.length > 0) return dateFields;
+
+    // Dynamic from default value
+    const fields: string[] = [];
+    if (defaultValue != null) {
+      let simpleObject;
+      if (Array.isArray(defaultValue)) {
+        if (defaultValue.length === 0) return [];
+        simpleObject = defaultValue[0];
+      } else {
+        simpleObject = defaultValue;
+      }
+
+      for (const [key, value] of Object.entries(simpleObject)) {
+        if (value instanceof Date) fields.push(key);
+      }
     }
 
-    /**
-     * Get content type and charset
-     * @param headers Headers
-     */
-    getContentTypeAndCharset(headers: HeadersAll): [string, string?] {
-        const contentType = this.getContentType(headers);
-        if (contentType) {
-            const parts = contentType.split(';');
-            return [
-                parts[0].trim(),
-                parts.length > 1 ? parts[1].trim() : undefined
-            ];
-        }
-        return ['', undefined];
-    }
+    return fields;
+  }
 
-    /**
-     * Get headers
-     * @returns Headers
-     */
-    protected getHeaders() {
-        let headers: HeadersAll;
-        if (this.config == null) {
-            headers = {};
-            this.config = { headers };
-        } else if (this.config.headers) {
-            headers = this.config.headers;
-        } else {
-            headers = {};
-            this.config.headers = headers;
-        }
-        return headers;
-    }
+  /**
+   * Get response data
+   * @param response API response
+   * @param reponseType Response data type
+   * @param dateFields Date field names
+   * @param defaultValue Default value
+   */
+  protected abstract responseData(
+    response: R,
+    responseType?: ApiResponseType,
+    dateFields?: string[],
+    defaultValue?: unknown
+  ): Promise<any>;
 
-    getContentDisposition(response: R): ContentDisposition | undefined;
-    getContentDisposition(header: string): ContentDisposition | undefined;
+  /**
+   * Get response error message
+   * @param data Response data
+   */
+  private responseErrorMessage(data: any) {
+    if (isResponseErrorData(data)) return data.message || data.title;
+    return undefined;
+  }
+
+  // Response promise handler for error catch
+  private responsePromiseHandler(promise: Promise<R>): Promise<{
     /**
-     * Get HTTP content dispostion
-     * @param responseOrValue Response or header value
-     * @returns Result
+     * Response
      */
-    getContentDisposition(responseOrValue: R | string) {
-        const cd =
-            typeof responseOrValue === 'string'
-                ? responseOrValue
-                : this.getHeaderValue(
-                      this.transformResponse(responseOrValue).headers,
-                      'Content-Disposition'
-                  );
-        return ContentDisposition.parse(cd);
-    }
+    response?: R;
 
     /**
-     * Get content type
-     * @param headers Headers
+     * Error
      */
-    getHeaderValue(headers: HeadersAll, key: string): string | null {
-        // Key to lower case
-        key = key.toLowerCase();
+    error?: ApiError;
+  }> {
+    return promise
+      .then(async (response) => {
+        // Destruct
+        const { ok, status, statusText } = this.transformResponse(response);
 
-        // String array
-        // isIterable(headers) = true, Array.isArray(headers) also true
-        // so Array.from(headers) will never happen
-        if (isIterable(headers) || Array.isArray(headers)) {
-            const array = Array.isArray(headers)
-                ? headers
-                : Array.from(headers);
-            const arrayItem = array.find(
-                (item) => item[0].toLowerCase() === key
-            );
-            if (arrayItem == null) return null;
-            return arrayItem[1];
-        }
-
-        // Standard Headers
-        if (headers instanceof Headers) {
-            return headers.get(key);
-        }
-
-        // Simple object
-        const matchKey = Object.keys(headers).find(
-            (item) => item.toLowerCase() === key
-        );
-        if (matchKey) return headers[matchKey];
-
-        return null;
-    }
-
-    /**
-     * Set content language
-     * @param language Content language
-     * @param headers Headers, default is global headers
-     */
-    setContentLanguage(
-        language: string | null | undefined,
-        headers?: HeadersAll
-    ) {
-        this.setHeaderValue(
-            'Content-Language',
-            language,
-            headers ?? this.getHeaders()
-        );
-    }
-
-    /**
-     * Set content type
-     * @param contentType New content type
-     * @param headers Headers
-     */
-    protected setContentType(
-        contentType: string | null | undefined,
-        headers: HeadersAll
-    ): void {
-        let value = contentType;
-        if (value && !value.includes('charset=')) {
-            // Test charset
-            value += `; charset=${this.charset}`;
-        }
-        this.setHeaderValue(ApiBase.ContentTypeKey, value, headers);
-    }
-
-    /**
-     * Set header value
-     * @param key Header name
-     * @param value Header value
-     * @param headers Optional headers to lookup
-     */
-    setHeaderValue(
-        key: string,
-        value: string | null | undefined,
-        headers: HeadersAll
-    ): void {
-        // Key to lower case
-        key = key.toLowerCase();
-
-        // isIterable(headers) = true, Array.isArray(headers) also true
-        // so Array.from(headers) will never happen
-        // so push and splice without updating the source array will be effective
-        if (isIterable(headers) || Array.isArray(headers)) {
-            const array = Array.isArray(headers)
-                ? headers
-                : Array.from(headers);
-
-            const index = array.findIndex(
-                (item) => item[0].toLowerCase() === key
-            );
-
-            if (value) {
-                if (index === -1) array.push([key, value]);
-                else array[index][1] = value;
-            } else if (index !== -1) {
-                array.splice(index, 1);
-            }
-
-            return;
+        if (ok) {
+          return { response };
         }
 
-        // Standard Headers
-        if (headers instanceof Headers) {
-            if (value) headers.set(key, value);
-            else headers.delete(key);
-            return;
+        // Other status codes are considered as error
+        // Try to read response JSON data
+        let errorMessage: string | undefined;
+        try {
+          // When parse, may have unexpected end of JSON input
+          const responseData = await this.responseData(
+            response,
+            ApiResponseType.Json
+          );
+          errorMessage = this.responseErrorMessage(responseData);
+        } catch {
+          errorMessage = undefined;
         }
 
-        // Simple object
-        const matchKey =
-            Object.keys(headers).find((item) => item.toLowerCase() === key) ||
-            key;
-        if (value) headers[matchKey] = value;
-        else delete headers[matchKey];
+        const message = errorMessage || statusText || "Unkown";
+        const error = new ApiError(message, status);
+        return { error, response };
+      })
+      .catch((reason) => {
+        const exception: Error = reason;
+        const error = new ApiError(exception.message || "Network Error", -1);
+        return Promise.resolve({ error });
+      });
+  }
+
+  // Dispatch response callback
+  private dispatchResponseCallback(data: IApiData, response?: R) {
+    // On response callback
+    if (response && this.onResponse) {
+      this.onResponse(data, response);
+    }
+  }
+
+  // Dispatch response callback
+  private dispatchCompleteCallback(data: IApiData, response?: R) {
+    // On complete callback
+    if (this.onComplete) {
+      this.onComplete(data, response);
+    }
+  }
+
+  /**
+   * Handle error
+   * @param error Error
+   * @param data Error data
+   * @param localDoError Local error handler
+   */
+  protected handleError(
+    error: Error,
+    data: IApiData,
+    response?: R,
+    localDoError?: IApiErrorHandler<R>
+  ) {
+    // Data error
+    const dataError = new ApiDataError<R>(error, data, response);
+
+    // Cache the error
+    this.lastErrorPrivate = dataError;
+
+    if (localDoError == null && this.onError == null) {
+      // No error handler, throw the error
+      throw dataError;
     }
 
-    /**
-     * Create response
-     * @param method Method
-     * @param url Api URL
-     * @param headers Headers
-     * @param data Data
-     * @param reponseType Response data type
-     * @param rest Rest properties
-     */
-    protected abstract createResponse(
-        method: ApiMethod,
-        url: string,
-        headers: HeadersAll,
-        data: any,
-        responseType: ApiResponseType | undefined,
-        rest: { [key: string]: any }
-    ): Promise<R>;
-
-    protected getDateFields(dateFields?: string[], defaultValue?: unknown) {
-        // Set static date fields
-        if (dateFields != null && dateFields.length > 0) return dateFields;
-
-        // Dynamic from default value
-        const fields: string[] = [];
-        if (defaultValue != null) {
-            let simpleObject;
-            if (Array.isArray(defaultValue)) {
-                if (defaultValue.length === 0) return [];
-                simpleObject = defaultValue[0];
-            } else {
-                simpleObject = defaultValue;
-            }
-
-            for (const [key, value] of Object.entries(simpleObject)) {
-                if (value instanceof Date) fields.push(key);
-            }
-        }
-
-        return fields;
+    if (localDoError && localDoError(dataError) === false) {
+      // Local error handler
+      // return false will prevent further handle
+      return;
     }
 
-    /**
-     * Get response data
-     * @param response API response
-     * @param reponseType Response data type
-     * @param dateFields Date field names
-     * @param defaultValue Default value
-     */
-    protected abstract responseData(
-        response: R,
-        responseType?: ApiResponseType,
-        dateFields?: string[],
-        defaultValue?: unknown
-    ): Promise<any>;
+    if (this.onError) {
+      // Global error handler
+      this.onError(dataError);
+    }
+  }
 
-    /**
-     * Get response error message
-     * @param data Response data
-     */
-    private responseErrorMessage(data: any) {
-        if (isResponseErrorData(data)) return data.message || data.title;
-        return undefined;
+  /**
+   * Transform URL parameters
+   * @param params URL parameters
+   */
+  private transformParams(params?: ApiParams): URLSearchParams {
+    // NULL
+    if (params == null) return new URLSearchParams();
+
+    // URLSearchParams
+    if (params instanceof URLSearchParams) return params;
+
+    // SimpleObject
+    return DomUtils.mergeURLSearchParams(new URLSearchParams(), params);
+  }
+
+  /**
+   * Request to API
+   * @param method Method
+   * @param url API URL
+   * @param data Passed data
+   * @param payload Payload
+   */
+  async request<T>(
+    method: ApiMethod,
+    url: string,
+    data?: ApiRequestData,
+    payload?: IApiPayload<T, R>
+  ): Promise<T | undefined> {
+    // Destruct payload
+    const {
+      contentType,
+      config = {},
+      dateFields,
+      defaultValue,
+      onError,
+      params,
+      parser,
+      responseType = this.defaultResponseType,
+      showLoading,
+      local
+    } = payload || {};
+
+    // Reset last error
+    this.lastErrorPrivate = undefined;
+
+    // Merge configure
+    this.mergeConfig(config);
+
+    // Destruct options
+    const { headers = {}, ...rest } = config;
+
+    // Transform params
+    const localParams = this.transformParams(params);
+
+    // Format the data
+    const [formattedData, formattedError] = this.formatData(
+      method,
+      headers,
+      localParams,
+      data,
+      contentType
+    );
+
+    // URL parameters
+    const parameters = localParams.toString();
+    const localUrl = parameters ? url.addUrlParams(parameters) : url;
+
+    // API data
+    const apiData: IApiData = {
+      data: formattedData,
+      headers,
+      method,
+      params: localParams,
+      responseType,
+      showLoading,
+      url: localUrl
+    };
+
+    // Format error occured
+    if (formattedError) {
+      apiData.depth = 0;
+      this.handleError(formattedError, apiData, undefined, onError);
+      return undefined;
     }
 
-    // Response promise handler for error catch
-    private responsePromiseHandler(promise: Promise<R>): Promise<{
-        /**
-         * Response
-         */
-        response?: R;
+    // On request callback
+    if (this.onRequest) this.onRequest(apiData);
 
-        /**
-         * Error
-         */
-        error?: ApiError;
-    }> {
-        return promise
-            .then(async (response) => {
-                // Destruct
-                const { ok, status, statusText } =
-                    this.transformResponse(response);
+    // Calculate the URL
+    const api = local ? localUrl : this.buildUrl(localUrl);
 
-                if (ok) {
-                    return { response };
-                }
+    // Act and the response
+    const { response, error } = await this.responsePromiseHandler(
+      this.createResponse(
+        method,
+        api,
+        headers,
+        formattedData,
+        responseType,
+        rest
+      )
+    );
 
-                // Other status codes are considered as error
-                // Try to read response JSON data
-                let errorMessage: string | undefined;
-                try {
-                    // When parse, may have unexpected end of JSON input
-                    const responseData = await this.responseData(
-                        response,
-                        ApiResponseType.Json
-                    );
-                    errorMessage = this.responseErrorMessage(responseData);
-                } catch {
-                    errorMessage = undefined;
-                }
+    // Complete API call
+    this.dispatchCompleteCallback(apiData, response);
 
-                const message = errorMessage || statusText || 'Unkown';
-                const error = new ApiError(message, status);
-                return { error, response };
-            })
-            .catch((reason) => {
-                const exception: Error = reason;
-                const error = new ApiError(
-                    exception.message || 'Network Error',
-                    -1
-                );
-                return Promise.resolve({ error });
-            });
-    }
+    if (error || response == null) {
+      // Error occured
+      const localError = error || new Error("No Response Error");
+      apiData.depth = 1;
+      this.handleError(localError, apiData, response, onError);
+    } else {
+      // Hold a reference
+      if (payload != null) payload.response = response;
 
-    // Dispatch response callback
-    private dispatchResponseCallback(data: IApiData, response?: R) {
-        // On response callback
-        if (response && this.onResponse) {
-            this.onResponse(data, response);
-        }
-    }
+      // Dispatch response callback
+      this.dispatchResponseCallback(apiData, response);
 
-    // Dispatch response callback
-    private dispatchCompleteCallback(data: IApiData, response?: R) {
-        // On complete callback
-        if (this.onComplete) {
-            this.onComplete(data, response);
-        }
-    }
-
-    /**
-     * Handle error
-     * @param error Error
-     * @param data Error data
-     * @param localDoError Local error handler
-     */
-    protected handleError(
-        error: Error,
-        data: IApiData,
-        response?: R,
-        localDoError?: IApiErrorHandler<R>
-    ) {
-        // Data error
-        const dataError = new ApiDataError<R>(error, data, response);
-
-        // Cache the error
-        this.lastErrorPrivate = dataError;
-
-        if (localDoError == null && this.onError == null) {
-            // No error handler, throw the error
-            throw dataError;
-        }
-
-        if (localDoError && localDoError(dataError) === false) {
-            // Local error handler
-            // return false will prevent further handle
-            return;
-        }
-
-        if (this.onError) {
-            // Global error handler
-            this.onError(dataError);
-        }
-    }
-
-    /**
-     * Transform URL parameters
-     * @param params URL parameters
-     */
-    private transformParams(params?: ApiParams): URLSearchParams {
-        // NULL
-        if (params == null) return new URLSearchParams();
-
-        // URLSearchParams
-        if (params instanceof URLSearchParams) return params;
-
-        // SimpleObject
-        return DomUtils.mergeURLSearchParams(new URLSearchParams(), params);
-    }
-
-    /**
-     * Request to API
-     * @param method Method
-     * @param url API URL
-     * @param data Passed data
-     * @param payload Payload
-     */
-    async request<T>(
-        method: ApiMethod,
-        url: string,
-        data?: ApiRequestData,
-        payload?: IApiPayload<T, R>
-    ): Promise<T | undefined> {
-        // Destruct payload
-        const {
-            contentType,
-            config = {},
-            dateFields,
-            defaultValue,
-            onError,
-            params,
-            parser,
-            responseType = this.defaultResponseType,
-            showLoading,
-            local
-        } = payload || {};
-
-        // Reset last error
-        this.lastErrorPrivate = undefined;
-
-        // Merge configure
-        this.mergeConfig(config);
-
-        // Destruct options
-        const { headers = {}, ...rest } = config;
-
-        // Transform params
-        const localParams = this.transformParams(params);
-
-        // Format the data
-        const [formattedData, formattedError] = this.formatData(
-            method,
-            headers,
-            localParams,
-            data,
-            contentType
+      // Return target type data
+      try {
+        const rawResult = await this.responseData(
+          response,
+          responseType,
+          dateFields,
+          defaultValue
         );
 
-        // URL parameters
-        const parameters = localParams.toString();
-        const localUrl = parameters ? url.addUrlParams(parameters) : url;
+        // May return null or ''
+        if (rawResult == null || rawResult === "") {
+          return defaultValue;
+        }
 
-        // API data
-        const apiData: IApiData = {
-            data: formattedData,
-            headers,
-            method,
-            params: localParams,
-            responseType,
-            showLoading,
-            url: localUrl
-        };
-
-        // Format error occured
-        if (formattedError) {
-            apiData.depth = 0;
-            this.handleError(formattedError, apiData, undefined, onError);
+        if (parser) {
+          // Parser case
+          const [parseError, parseResult] = parser(rawResult);
+          if (parseError) {
+            apiData.depth = 2;
+            this.handleError(parseError, apiData, response, onError);
             return undefined;
+          }
+
+          if (parseResult) return parseResult;
+          return defaultValue;
         }
 
-        // On request callback
-        if (this.onRequest) this.onRequest(apiData);
+        // Transform data type
+        return rawResult as T;
+      } catch (ex) {
+        // unknow type of ex more safe
+        // https://devblogs.microsoft.com/typescript/announcing-typescript-4-4/
+        const error = ex instanceof Error ? ex : new Error(String(ex));
 
-        // Calculate the URL
-        const api = local ? localUrl : this.buildUrl(localUrl);
-
-        // Act and the response
-        const { response, error } = await this.responsePromiseHandler(
-            this.createResponse(
-                method,
-                api,
-                headers,
-                formattedData,
-                responseType,
-                rest
-            )
-        );
-
-        // Complete API call
-        this.dispatchCompleteCallback(apiData, response);
-
-        if (error || response == null) {
-            // Error occured
-            const localError = error || new Error('No Response Error');
-            apiData.depth = 1;
-            this.handleError(localError, apiData, response, onError);
-        } else {
-            // Hold a reference
-            if (payload != null) payload.response = response;
-
-            // Dispatch response callback
-            this.dispatchResponseCallback(apiData, response);
-
-            // Return target type data
-            try {
-                const rawResult = await this.responseData(
-                    response,
-                    responseType,
-                    dateFields,
-                    defaultValue
-                );
-
-                // May return null or ''
-                if (rawResult == null || rawResult === '') {
-                    return defaultValue;
-                }
-
-                if (parser) {
-                    // Parser case
-                    const [parseError, parseResult] = parser(rawResult);
-                    if (parseError) {
-                        apiData.depth = 2;
-                        this.handleError(
-                            parseError,
-                            apiData,
-                            response,
-                            onError
-                        );
-                        return undefined;
-                    }
-
-                    if (parseResult) return parseResult;
-                    return defaultValue;
-                }
-
-                // Transform data type
-                return rawResult as T;
-            } catch (ex) {
-                // unknow type of ex more safe
-                // https://devblogs.microsoft.com/typescript/announcing-typescript-4-4/
-                const error = ex instanceof Error ? ex : new Error(String(ex));
-
-                apiData.depth = 3;
-                this.handleError(error, apiData, response, onError);
-            }
-        }
-
-        return undefined;
+        apiData.depth = 3;
+        this.handleError(error, apiData, response, onError);
+      }
     }
 
-    /**
-     * Transform original response to unified object
-     * @param response Original response
-     */
-    abstract transformResponse(response: R): IApiResponse;
+    return undefined;
+  }
 
-    /**
-     * Delete API
-     * @param url API URL
-     * @param data Passed data
-     * @param payload Payload
-     */
-    async delete<T>(
-        url: string,
-        data?: ApiRequestData,
-        payload?: IApiPayload<T, R>
-    ) {
-        const result = await this.request<T>(
-            ApiMethod.DELETE,
-            url,
-            data,
-            payload
-        );
-        return result;
-    }
+  /**
+   * Transform original response to unified object
+   * @param response Original response
+   */
+  abstract transformResponse(response: R): IApiResponse;
 
-    /**
-     * Get API
-     * @param url API URL
-     * @param data Passed data
-     * @param payload Payload
-     */
-    async get<T>(
-        url: string,
-        data?: ApiRequestData,
-        payload?: IApiPayload<T, R>
-    ) {
-        const result = await this.request<T>(ApiMethod.GET, url, data, payload);
-        return result;
-    }
+  /**
+   * Delete API
+   * @param url API URL
+   * @param data Passed data
+   * @param payload Payload
+   */
+  async delete<T>(
+    url: string,
+    data?: ApiRequestData,
+    payload?: IApiPayload<T, R>
+  ) {
+    const result = await this.request<T>(ApiMethod.DELETE, url, data, payload);
+    return result;
+  }
 
-    /**
-     * Head API
-     * @param url API URL
-     * @param data Passed data
-     * @param payload Payload
-     */
-    async head<T>(
-        url: string,
-        data?: ApiRequestData,
-        payload?: IApiPayload<T, R>
-    ) {
-        const result = await this.request<T>(
-            ApiMethod.HEAD,
-            url,
-            data,
-            payload
-        );
-        return result;
-    }
+  /**
+   * Get API
+   * @param url API URL
+   * @param data Passed data
+   * @param payload Payload
+   */
+  async get<T>(
+    url: string,
+    data?: ApiRequestData,
+    payload?: IApiPayload<T, R>
+  ) {
+    const result = await this.request<T>(ApiMethod.GET, url, data, payload);
+    return result;
+  }
 
-    /**
-     * Options API
-     * @param url API URL
-     * @param data Passed data
-     * @param payload Payload
-     */
-    async options<T>(
-        url: string,
-        data?: ApiRequestData,
-        payload?: IApiPayload<T, R>
-    ) {
-        const result = await this.request<T>(
-            ApiMethod.OPTIONS,
-            url,
-            data,
-            payload
-        );
-        return result;
-    }
+  /**
+   * Head API
+   * @param url API URL
+   * @param data Passed data
+   * @param payload Payload
+   */
+  async head<T>(
+    url: string,
+    data?: ApiRequestData,
+    payload?: IApiPayload<T, R>
+  ) {
+    const result = await this.request<T>(ApiMethod.HEAD, url, data, payload);
+    return result;
+  }
 
-    /**
-     * Patch API
-     * @param url API URL
-     * @param data Passed data
-     * @param payload Payload
-     */
-    async patch<T>(
-        url: string,
-        data?: ApiRequestData,
-        payload?: IApiPayload<T, R>
-    ) {
-        const result = await this.request<T>(
-            ApiMethod.PATCH,
-            url,
-            data,
-            payload
-        );
-        return result;
-    }
+  /**
+   * Options API
+   * @param url API URL
+   * @param data Passed data
+   * @param payload Payload
+   */
+  async options<T>(
+    url: string,
+    data?: ApiRequestData,
+    payload?: IApiPayload<T, R>
+  ) {
+    const result = await this.request<T>(ApiMethod.OPTIONS, url, data, payload);
+    return result;
+  }
 
-    /**
-     * Post API
-     * @param url API URL
-     * @param data Passed data
-     * @param payload Payload
-     */
-    async post<T>(
-        url: string,
-        data?: ApiRequestData,
-        payload?: IApiPayload<T, R>
-    ) {
-        const result = await this.request<T>(
-            ApiMethod.POST,
-            url,
-            data,
-            payload
-        );
-        return result;
-    }
+  /**
+   * Patch API
+   * @param url API URL
+   * @param data Passed data
+   * @param payload Payload
+   */
+  async patch<T>(
+    url: string,
+    data?: ApiRequestData,
+    payload?: IApiPayload<T, R>
+  ) {
+    const result = await this.request<T>(ApiMethod.PATCH, url, data, payload);
+    return result;
+  }
 
-    /**
-     * Put API
-     * @param url API URL
-     * @param data Passed data
-     * @param payload Payload
-     */
-    async put<T>(
-        url: string,
-        data?: ApiRequestData,
-        payload?: IApiPayload<T, R>
-    ) {
-        const result = await this.request<T>(ApiMethod.PUT, url, data, payload);
-        return result;
-    }
+  /**
+   * Post API
+   * @param url API URL
+   * @param data Passed data
+   * @param payload Payload
+   */
+  async post<T>(
+    url: string,
+    data?: ApiRequestData,
+    payload?: IApiPayload<T, R>
+  ) {
+    const result = await this.request<T>(ApiMethod.POST, url, data, payload);
+    return result;
+  }
+
+  /**
+   * Put API
+   * @param url API URL
+   * @param data Passed data
+   * @param payload Payload
+   */
+  async put<T>(
+    url: string,
+    data?: ApiRequestData,
+    payload?: IApiPayload<T, R>
+  ) {
+    const result = await this.request<T>(ApiMethod.PUT, url, data, payload);
+    return result;
+  }
 }
