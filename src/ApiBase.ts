@@ -18,7 +18,8 @@ import {
   IApiCompleteHandler,
   IPData,
   HeadersAll,
-  isIterable
+  isIterable,
+  IApiConfigShared
 } from "./IApi";
 import { ApiError } from "./ApiError";
 import { ApiDataError } from "./ApiDataError";
@@ -511,7 +512,7 @@ export abstract class ApiBase<R = any> implements IApi<R> {
     headers: HeadersAll,
     data: any,
     responseType: ApiResponseType | undefined,
-    rest: { [key: string]: any }
+    rest: IApiConfigShared
   ): Promise<R>;
 
   protected getDateFields(dateFields?: string[], defaultValue?: unknown) {

@@ -7,7 +7,13 @@ import axios, {
 } from "axios";
 import { DateUtils, DomUtils } from "@etsoo/shared";
 import { ApiBase } from "./ApiBase";
-import { ApiMethod, ApiResponseType, HeadersAll, IApiResponse } from "./IApi";
+import {
+  ApiMethod,
+  ApiResponseType,
+  HeadersAll,
+  IApiConfigShared,
+  IApiResponse
+} from "./IApi";
 
 /**
  * Axios API
@@ -48,7 +54,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
     headers: HeadersAll,
     data: any,
     responseType: ApiResponseType | undefined,
-    rest: { [key: string]: any }
+    rest: IApiConfigShared
   ): Promise<AxiosResponse> {
     // Transform response type
     const localResponseType =
@@ -57,14 +63,24 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
         : (ApiResponseType[responseType].toLowerCase() as ResponseType);
 
     // Request body
-    const requestBody = {
-      ...rest,
+    const requestBody: axios.AxiosRequestConfig = {
       data,
       headers: DomUtils.headersToObject(headers),
       method: ApiMethod[method] as Method,
       responseType: localResponseType,
       url
     };
+
+    // Merge rest properties
+    // Based on https://developer.mozilla.org/en-US/docs/Web/API/RequestInit
+    if (rest.credentials && rest.credentials !== "omit") {
+      requestBody.withCredentials = true;
+    }
+
+    if (rest.signal) {
+      requestBody.signal = rest.signal;
+    }
+
     return axios(requestBody);
   }
 

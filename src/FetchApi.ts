@@ -4,6 +4,7 @@ import {
   ApiMethod,
   ApiResponseType,
   HeadersAll,
+  IApiConfigShared,
   IApiResponse,
   isIterable
 } from "./IApi";
@@ -39,7 +40,7 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
     headers: HeadersAll,
     data: any,
     _responseType: ApiResponseType | undefined,
-    rest: { [key: string]: any }
+    rest: IApiConfigShared
   ): Promise<R> {
     // Headers
     const h = new Headers(
@@ -47,7 +48,7 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
     );
 
     // Request body
-    const requestBody = {
+    const requestBody: RequestInit = {
       ...rest,
       body: data,
       headers: h,

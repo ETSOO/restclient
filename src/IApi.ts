@@ -67,16 +67,22 @@ export interface IPData {
 /**
  * API configures interface
  */
-export interface IApiConfig {
-  /**
-   * Dynamic data
-   */
-  [key: string]: unknown;
-
+export interface IApiConfig extends IApiConfigShared {
   /**
    * Headers
    */
   headers?: HeadersAll;
+}
+
+/**
+ * API configures interface
+ */
+export interface IApiConfigShared
+  extends Omit<RequestInit, "headers" | "body" | "method"> {
+  /**
+   * Dynamic data
+   */
+  [key: string]: unknown;
 }
 
 /**
