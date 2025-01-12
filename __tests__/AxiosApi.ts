@@ -7,6 +7,7 @@ import axios, {
 import { AxiosApi } from "../src/AxiosApi";
 import { ApiMethod, ApiResponseType, ApiRequestData } from "../src/IApi";
 import { ApiError } from "../src/ApiError";
+import { MockedFunction } from "vitest";
 
 /**
  * Axios Api helper class for testing
@@ -88,10 +89,10 @@ const setupData = [
   { id: "NZ", name: "New Zealand", creation: "1907-9-26" }
 ];
 
-jest.mock("axios");
+vi.mock("axios");
 
 // axios as unknown to avoid properties mismatch.
-const mockedAxios = axios as unknown as jest.MockedFunction<{
+const mockedAxios = axios as unknown as MockedFunction<{
   (config: AxiosRequestConfig): AxiosPromise;
 }>;
 

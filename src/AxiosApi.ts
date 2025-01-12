@@ -3,7 +3,8 @@ import axios, {
   AxiosResponse,
   ResponseType,
   RawAxiosResponseHeaders,
-  AxiosResponseHeaders
+  AxiosResponseHeaders,
+  AxiosRequestConfig
 } from "axios";
 import { DateUtils, DomUtils } from "@etsoo/shared";
 import { ApiBase } from "./ApiBase";
@@ -63,7 +64,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
         : (ApiResponseType[responseType].toLowerCase() as ResponseType);
 
     // Request body
-    const requestBody: axios.AxiosRequestConfig = {
+    const requestBody: AxiosRequestConfig = {
       data,
       headers: DomUtils.headersToObject(headers),
       method: ApiMethod[method] as Method,

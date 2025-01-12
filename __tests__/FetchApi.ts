@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { enableFetchMocks } from "jest-fetch-mock";
+import createFetchMock from "vitest-fetch-mock";
 import { FetchApi } from "../src/FetchApi";
 import {
   ApiMethod,
@@ -9,7 +9,6 @@ import {
   ApiAuthorizationScheme,
   IApiPayload
 } from "../src/IApi";
-import { ApiBase } from "../src";
 
 /**
  * Fetch Api helper class for testing
@@ -115,8 +114,8 @@ interface CountryItem {
 }
 
 // Enable fetch mocks to avoid Headers/fetch is not defined
-// https://www.npmjs.com/package/jest-fetch-mock
-enableFetchMocks();
+const fetchMocker = createFetchMock(vi);
+fetchMocker.enableMocks();
 
 // Before each test, reset mocks
 beforeEach(() => {
@@ -308,7 +307,8 @@ describe("GET tests", () => {
   it("Failure result", async () => {
     // Mock the response data
     fetchMock.mockResponse('{ title: "Not Found" }', {
-      status: 404
+      status: 404,
+      statusText: "Not Found"
     });
 
     // Act

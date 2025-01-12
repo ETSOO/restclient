@@ -2,17 +2,18 @@
   "compilerOptions": {
     "target": "ES2020",
     "allowJs": false,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Node10",
+    "module": "ES2020",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "declaration": true
+    "declaration": true,
+    "types": ["vitest/globals"]
   },
   "include": [".."]
 }
