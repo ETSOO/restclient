@@ -215,6 +215,13 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
     getJson<T = DataTypes.ReadonlyData>(url: string): Promise<T>;
 
     /**
+     * Get status text
+     * @param status Status code
+     * @returns Status text
+     */
+    getStatusText(status: number): string;
+
+    /**
      * Request to API
      * @param method Method
      * @param url API URL

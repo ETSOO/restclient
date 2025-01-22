@@ -156,7 +156,7 @@ export class FetchLikeApi<R extends Response> extends ApiBase<R> {
       headers,
       ok,
       status,
-      statusText
+      statusText: statusText ? statusText : this.getStatusText(status)
     };
   }
 }

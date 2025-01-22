@@ -170,7 +170,7 @@ export class AxiosApi extends ApiBase<AxiosResponse> {
       headers: this.transformHeaders(headers),
       ok,
       status,
-      statusText
+      statusText: statusText ? statusText : this.getStatusText(status)
     };
   }
 }

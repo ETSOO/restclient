@@ -453,6 +453,13 @@ export interface IApi<R = any> {
   getJson<T extends {} = {}>(url: string): Promise<T | undefined>;
 
   /**
+   * Get status text
+   * @param status Status code
+   * @returns Status text
+   */
+  getStatusText(status: number): string;
+
+  /**
    * Head API
    * @param url API URL
    * @param data Passed data

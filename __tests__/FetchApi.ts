@@ -328,6 +328,33 @@ describe("GET tests", () => {
     expect(api.lastError?.data.url).toBe("/Customer/CountryList");
   });
 
+  it("Failure result with statusText", async () => {
+    // Mock the response data
+    fetchMock.mockResponse(undefined, {
+      status: 400,
+      statusText: ""
+    });
+
+    // Act
+    const failResult = await api.post<CountryItem[]>(
+      "/Customer/CountryList",
+      undefined,
+      {
+        onError: (error) => {
+          if (error.response) {
+            const data = api.transformResponse(error.response);
+            expect(data).toHaveProperty("status", 400);
+            expect(data).toHaveProperty("statusText", api.getStatusText(400));
+          }
+        }
+      }
+    );
+
+    // Assert
+    expect(failResult).toBeUndefined();
+    expect(api.getStatusText(429)).toBe("Too Many Requests");
+  });
+
   it("Failure result with .NET model validation", async () => {
     // Mock the response data
     const data = {
