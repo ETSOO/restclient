@@ -196,15 +196,21 @@ export abstract class ApiBase<R = any> implements IApi<R> {
 
   /**
    * Detect IP data
+   * @param ip IP address or query URLs
    * @returns IP data
    */
-  async detectIP() {
+  async detectIP(ip?: string | URL | string[]) {
     // Endpoints for detection
-    const endpoints = [
-      "https://extreme-ip-lookup.com/json/",
-      "https://geoip-db.com/json/",
-      "https://ipapi.co/json"
-    ];
+    const endpoints = Array.isArray(ip)
+      ? ip
+      : typeof ip === "object"
+      ? [ip.toString()]
+      : [
+          `https://ipapi.co/${ip ? ip + "/json" : "json"}`,
+          `https://extreme-ip-lookup.com/json/${
+            ip ?? ""
+          }?key=xyEfrZDwypXT7XETXgPB`
+        ];
 
     // Any success result
     let data: Readonly<DataTypes.StringDictionary> | undefined;
@@ -230,9 +236,11 @@ export abstract class ApiBase<R = any> implements IApi<R> {
 
     // IP data
     const ipData: IPData = {
-      ip: data.query ?? data.IPv4 ?? data.IPv6,
-      country: data.country ?? data.country_name,
+      ip: data.query ?? data.IPv4 ?? data.IPv6 ?? data.ip,
+      country: data.country_name ?? data.country,
       countryCode: data.countryCode ?? data.country_code,
+      region: data.regionName ?? data.region,
+      city: data.city,
       timezone: data.timezone
     };
 

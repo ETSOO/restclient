@@ -59,6 +59,16 @@ export interface IPData {
   readonly countryCode: string;
 
   /**
+   * Region name, like Auckland
+   */
+  readonly region: string;
+
+  /**
+   * City name, like Auckland
+   */
+  readonly city: string;
+
+  /**
    * Timezone, like Pacific/Auckland
    */
   readonly timezone?: string;
@@ -390,9 +400,10 @@ export interface IApi<R = any> {
 
   /**
    * Detect IP data
+   * @param ip IP address or query URLs
    * @returns IP data
    */
-  detectIP(): Promise<IPData | undefined>;
+  detectIP(ip?: string | URL | string[]): Promise<IPData | undefined>;
 
   /**
    * Get HTTP content dispostion

@@ -417,8 +417,11 @@ describe("GET tests", () => {
       })
     );
 
-    const data = await api.getJson("http://ip-api.com/json");
-    expect(data).toHaveProperty("query", "101.98.49.5");
+    const data = await api.detectIP();
+    expect(data?.ip).toBe("101.98.49.5");
+    expect(data?.country).toBe("New Zealand");
+    expect(data?.region).toBe("Auckland");
+    expect(data?.city).toBe("Auckland");
   });
 });
 

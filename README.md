@@ -176,9 +176,10 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
 
     /**
      * Detect IP data
+     * @param ip IP address or query URLs
      * @returns IP data
      */
-    detectIP(): Promise<IPData | undefined>;
+    detectIP(ip?: string | URL | string[]): Promise<IPData | undefined>;
 
     /**
      * Get HTTP content dispostion
