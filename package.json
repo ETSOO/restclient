@@ -1,6 +1,6 @@
 {
   "name": "@etsoo/restclient",
-  "version": "1.1.26",
+  "version": "1.1.27",
   "description": "TypeScript REST client supports Axios and Fetch",
   "main": "lib/cjs/index.js",
   "module": "lib/mjs/index.js",
@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/ETSOO/restclient#readme",
   "dependencies": {
-    "@etsoo/shared": "^1.2.64",
+    "@etsoo/shared": "^1.2.68",
     "axios": "^1.8.4"
   },
   "devDependencies": {
@@ -48,9 +48,9 @@
     "@babel/plugin-transform-runtime": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "@babel/runtime-corejs3": "^7.27.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "jsdom": "^26.0.0",
-    "typescript": "^5.8.2",
+    "@vitejs/plugin-react": "^4.4.0",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.8.3",
     "vitest": "^3.1.1",
     "vitest-fetch-mock": "^0.4.5"
   }

@@ -433,7 +433,12 @@ describe("POST tests", () => {
     const localApi = new FetchApi();
 
     // Global authorization
-    localApi.authorize("etsoo", "abc");
+    localApi.authorize("etsoo", " abc");
+
+    // Authorization header
+    const { scheme, token } = localApi.getAuthorization() ?? {};
+    expect(scheme).toBe("etsoo");
+    expect(token).toBe(" abc");
 
     // On request
     localApi.onRequest = (apiData) => {

@@ -273,6 +273,22 @@ export abstract class ApiBase<R = any> implements IApi<R> {
   abstract getJson<T extends {} = {}>(url: string): Promise<T | undefined>;
 
   /**
+   * Get authorization header value
+   * @returns Authorization header value
+   */
+  getAuthorization() {
+    const value = this.getHeaderValue(this.getHeaders(), "Authorization");
+    if (value) {
+      const pos = value.indexOf(" ");
+      if (pos > 0) {
+        const scheme = value.substring(0, pos);
+        const token = value.substring(pos + 1);
+        return { scheme, token };
+      }
+    }
+  }
+
+  /**
    * Get status text
    * @param status Status code
    * @returns Status text

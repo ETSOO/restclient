@@ -406,6 +406,12 @@ export interface IApi<R = any> {
   detectIP(ip?: string | URL | string[]): Promise<IPData | undefined>;
 
   /**
+   * Get authorization header value
+   * @returns Authorization header value
+   */
+  getAuthorization(): { scheme: string; token: string } | undefined;
+
+  /**
    * Get HTTP content dispostion
    * @param responseOrValue Response or header value
    * @returns Result

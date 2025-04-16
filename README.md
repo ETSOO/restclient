@@ -5,7 +5,7 @@
 - axios: https://github.com/axios/axios, based on XHR: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 - fetch: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
-ESLint + AirbnbBase + Prettier, Jest(ts-jest) applied, supports CommonJs and ESM. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
+Vitest applied, supports CommonJs and ESM. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
 
 Includes FetchLikeApi for extension quickly:
 
@@ -180,6 +180,12 @@ Provides **delete, get, head, options, patch, post, put** syntactic sugar for **
      * @returns IP data
      */
     detectIP(ip?: string | URL | string[]): Promise<IPData | undefined>;
+
+    /**
+     * Get authorization header value
+     * @returns Authorization header value
+     */
+    getAuthorization(): { scheme: string; token: string } | undefined;
 
     /**
      * Get HTTP content dispostion
