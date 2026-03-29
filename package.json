@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/ETSOO/restclient#readme",
   "dependencies": {
-    "@etsoo/shared": "^1.2.80",
+    "@etsoo/shared": "^1.2.81",
     "axios": "^1.14.0"
   },
   "devDependencies": {
