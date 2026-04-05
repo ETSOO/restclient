@@ -5,8 +5,7 @@ import type { IApi } from "./IApi";
  */
 export async function createClientAsync(): Promise<IApi> {
   if (typeof fetch === "undefined") {
-    const { AxiosApi } = await import("./AxiosApi.js");
-    return new AxiosApi();
+    throw new Error("Fetch API is not supported in this environment.");
   }
 
   const { FetchApi } = await import("./FetchApi.js");

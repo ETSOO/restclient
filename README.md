@@ -1,9 +1,9 @@
 # @etsoo/restclient
 
-**TypeScript promise based HTTP/REST API client. Unified axios and fetch usage.**
+**TypeScript promise based HTTP/REST API client.**
 
-- axios: https://github.com/axios/axios, based on XHR: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 - fetch: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+- node-fetch: https://github.com/node-fetch/node-fetch
 
 Vitest applied, supports CommonJs and ESM. About how to build a NPM package and CI/CD with Github action: https://dev.to/garryxiao/build-a-react-components-npm-package-and-ci-cd-with-github-action-1jm6
 
@@ -49,7 +49,7 @@ $ yarn add @etsoo/restclient
 
 ### Initialization
 
-- Depending on the envioronment, fetch first, then use axios.
+- Depending on the envioronment, fetch first.
 - Under node, supports node-fetch.
 
 ```ts
@@ -66,10 +66,6 @@ const client = await createClientAsync();
 ```ts
 import { FetchApi } from "@etsoo/restclient";
 const client = new FetchApi();
-
-// Or
-import { AxiosApi } from "@etsoo/restclient";
-const client = new AxiosApi();
 ```
 
 ### Calls
@@ -146,7 +142,7 @@ if (customer == null) {
 | ------------------: | ---------------------------------------------- |
 |             baseUrl | API base URL, add to the API root of all calls |
 |             charset | Charset for sending data, default is 'utf-8'   |
-|              config | See axios/Request Config or fetch/RequestInit  |
+|              config | See Request Config or fetch/RequestInit        |
 | defaultResponseType | Default type is JSON                           |
 |     jsonContentType | JSON content type string, 'application/json'   |
 |           lastError | Last error for track                           |
@@ -279,7 +275,7 @@ When you call any API, pass additional properties with the payload parameter.
 | -----------: | -------------------------------------------------------------------------------- |
 |  contentType | Specify data type to send, like 'application/json'                               |
 |      onError | Current API call error callback                                                  |
-|       config | Current API config. See axios/Request Config or fetch/RequestInit                |
+|       config | Current API config. See Request Config or fetch/RequestInit                      |
 | defaultValue | Default value, like [] for array return to distinguish undefined or error return |
 |       params | URL parameters                                                                   |
 |       parser | Current API response data parser                                                 |
