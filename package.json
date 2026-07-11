@@ -1,6 +1,6 @@
 {
   "name": "@etsoo/restclient",
-  "version": "1.1.37",
+  "version": "1.1.38",
   "description": "TypeScript REST client wrapup built-in Fetch",
   "main": "lib/cjs/index.js",
   "module": "lib/mjs/index.js",
@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/ETSOO/restclient#readme",
   "dependencies": {
-    "@etsoo/shared": "^1.2.87"
+    "@etsoo/shared": "^1.2.88"
   },
   "devDependencies": {
     "@babel/core": "^8.0.1",
@@ -48,7 +48,7 @@
     "@vitejs/plugin-react": "^6.0.3",
     "jsdom": "^29.1.1",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9",
+    "vitest": "^4.1.10",
     "vitest-fetch-mock": "^0.4.5"
   },
   "allowScripts": {
